@@ -59,12 +59,20 @@ export default function MessageBubble({ message }) {
 function renderWithCitations(text, citations) {
   if (!text || !citations?.length) return text
 
-  const parts = text.split(/(\[Section [^\]]+\])/g)
+  // Match patterns like [Section 266(a)], [Criminal Code, Section 267], etc.
+  const parts = text.split(/(\[[^\]]*Section [^\]]+\])/g)
   return parts.map((part, i) => {
-    const match = part.match(/\[Section ([^\]]+)\]/)
+    const match = part.match(/\[(?:[^,\]]+,\s*)?Section ([^\]]+)\]/)
     if (match) {
-      const label = match[1]
-      const citation = citations.find(c => c.label === label || part.includes(c.label))
+      const ref = match[1].trim()
+      const citation = citations.find(c => {
+        if (c.label === ref) return true
+        // Match base section number: "266(a)" should match citation label "266"
+        const baseRef = ref.replace(/\(.*$/, '')
+        if (c.label === baseRef) return true
+        // Check if the reference text contains the citation label
+        return ref.includes(c.label)
+      })
       if (citation) {
         return <CitationBadge key={i} citation={citation} inline />
       }

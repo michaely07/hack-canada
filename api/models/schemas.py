@@ -28,6 +28,7 @@ class QueryResponse(BaseModel):
     confidence: str = "low"
     reason: Optional[str] = None
     retrieved_sections: Optional[List[RetrievedSectionSchema]] = None
+    conversation_id: Optional[str] = None
 
 # --- Laws ---
 class LawSummarySchema(BaseModel):

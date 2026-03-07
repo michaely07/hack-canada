@@ -1,5 +1,41 @@
 import { create } from 'zustand'
 
+/**
+ * Extract the answer text from a partial JSON string being streamed.
+ * Gemini outputs: {"answer": "text...", "citations": [...]}
+ * We pull out just the answer value for clean display during streaming.
+ */
+function extractAnswerFromPartialJson(raw) {
+  const marker = '"answer"'
+  const idx = raw.indexOf(marker)
+  if (idx === -1) return null
+
+  const afterKey = raw.indexOf(':', idx + marker.length)
+  if (afterKey === -1) return null
+
+  const rest = raw.substring(afterKey + 1).trimStart()
+  if (rest.startsWith('null')) return null
+  if (!rest.startsWith('"')) return null
+
+  let text = ''
+  let i = 1 // skip opening quote
+  while (i < rest.length) {
+    if (rest[i] === '\\' && i + 1 < rest.length) {
+      const next = rest[i + 1]
+      if (next === 'n') { text += '\n'; i += 2; continue }
+      if (next === 't') { text += '\t'; i += 2; continue }
+      if (next === '"') { text += '"'; i += 2; continue }
+      if (next === '\\') { text += '\\'; i += 2; continue }
+      text += next; i += 2; continue
+    }
+    if (rest[i] === '"') break
+    text += rest[i]
+    i++
+  }
+
+  return text || null
+}
+
 // Separate audio element just for unlocking browser autoplay policy
 const _unlockAudio = new Audio()
 
@@ -17,7 +53,6 @@ export const useChatStore = create((set, get) => ({
 
   setLoading: (loading) => set({ isLoading: loading }),
   setStreamingContent: (content) => set({ streamingContent: content }),
-  appendStreamingContent: (text) => set(s => ({ streamingContent: s.streamingContent + text })),
 
   stopAudio: () => {
     const { _audio } = get()
@@ -89,8 +124,10 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  clearConversation: () => set({ messages: [], conversationId: null, streamingContent: '' }),
+
   sendQuery: async (query, lawCode = null) => {
-    const { addMessage, setLoading, setStreamingContent, appendStreamingContent } = get()
+    const { addMessage, setLoading, setStreamingContent } = get()
 
     // Unlock browser audio context synchronously on user click
     // Uses a separate element so it can't interfere with real playback
@@ -105,8 +142,12 @@ export const useChatStore = create((set, get) => ({
       const res = await fetch('/api/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, language: 'en', law_code: lawCode }),
+        body: JSON.stringify({ query, language: 'en', law_code: lawCode, conversation_id: get().conversationId }),
       })
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -114,6 +155,7 @@ export const useChatStore = create((set, get) => ({
       let fullText = ''
       let citations = []
       let confidence = 'low'
+      let streamError = null
 
       while (true) {
         const { done, value } = await reader.read()
@@ -130,34 +172,58 @@ export const useChatStore = create((set, get) => ({
 
           try {
             const event = JSON.parse(jsonStr)
-            if (event.type === 'token') {
+            if (event.type === 'conversation_id') {
+              set({ conversationId: event.data })
+            } else if (event.type === 'token') {
               fullText += event.data
-              appendStreamingContent(event.data)
+              const displayText = extractAnswerFromPartialJson(fullText)
+              if (displayText) {
+                setStreamingContent(displayText)
+              }
             } else if (event.type === 'citations') {
               citations = event.data || []
             } else if (event.type === 'confidence') {
               confidence = event.data || 'low'
+            } else if (event.detail) {
+              // Backend error event (e.g., Gemini rate limit)
+              streamError = event.detail
             }
           } catch {}
         }
       }
 
-      // Parse the JSON answer from the streamed text
+      // Parse the complete JSON to extract final answer + citations
       let answer = fullText
       try {
-        const parsed = JSON.parse(fullText)
-        answer = parsed.answer || fullText
+        let raw = fullText.trim()
+        if (raw.startsWith('```')) {
+          raw = raw.split('\n', 1)[1]
+          raw = raw.substring(0, raw.lastIndexOf('```')).trim()
+        }
+        const parsed = JSON.parse(raw)
+        answer = parsed.answer || null
         if (!citations.length && parsed.citations) {
           citations = parsed.citations
         }
         if (parsed.confidence) {
           confidence = parsed.confidence
         }
-      } catch {}
+      } catch {
+        // JSON parse failed — extract answer from partial JSON as fallback
+        const extracted = extractAnswerFromPartialJson(fullText)
+        if (extracted) {
+          answer = extracted
+        }
+      }
 
       setStreamingContent('')
 
-      const finalAnswer = answer || 'I could not find relevant information in the federal statutes.'
+      let finalAnswer
+      if (streamError) {
+        finalAnswer = 'The AI service is temporarily busy. Please wait a moment and try again.'
+      } else {
+        finalAnswer = answer || 'I could not find relevant information in the federal statutes.'
+      }
 
       addMessage({
         role: 'assistant',
@@ -166,8 +232,8 @@ export const useChatStore = create((set, get) => ({
         confidence,
       })
 
-      // Auto-play the final answer via TTS
-      get().playMessageAudio(finalAnswer)
+      // Fire-and-forget TTS — must NOT affect the query pipeline
+      try { get().playMessageAudio(finalAnswer) } catch {}
     } catch (err) {
       setStreamingContent('')
       addMessage({

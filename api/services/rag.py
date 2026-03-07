@@ -31,21 +31,30 @@ CONFIDENCE LEVELS:
 - "low": Answer relies mostly on general knowledge with limited excerpt support"""
 
 
-def build_prompt(query: str, sections: list[SectionResult]) -> str:
+def build_prompt(query: str, sections: list[SectionResult], history: list[dict] | None = None) -> str:
     context_blocks = "\n---\n".join(
         f"[{s.law_title} | Section {s.label} | lims_id: {s.lims_id}]\n{s.content_text}"
         for s in sections
     )
-    return f"""{SYSTEM_PROMPT}
 
+    history_block = ""
+    if history:
+        lines = []
+        for msg in history[-10:]:
+            role_label = "USER" if msg["role"] == "user" else "ASSISTANT"
+            lines.append(f"{role_label}: {msg['content']}")
+        history_block = f"\nCONVERSATION HISTORY:\n" + "\n".join(lines) + "\n"
+
+    return f"""{SYSTEM_PROMPT}
+{history_block}
 CONTEXT BLOCKS:
 {context_blocks}
 
 USER QUESTION: {query}"""
 
 
-async def generate_response(query: str, sections: list[SectionResult]) -> dict:
-    prompt = build_prompt(query, sections)
+async def generate_response(query: str, sections: list[SectionResult], history: list[dict] | None = None) -> dict:
+    prompt = build_prompt(query, sections, history)
     response = model.generate_content(
         prompt, 
         generation_config={"response_mime_type": "application/json"}
@@ -73,8 +82,8 @@ async def generate_response(query: str, sections: list[SectionResult]) -> dict:
     return parsed
 
 
-async def generate_response_stream(query: str, sections: list[SectionResult]):
-    prompt = build_prompt(query, sections)
+async def generate_response_stream(query: str, sections: list[SectionResult], history: list[dict] | None = None):
+    prompt = build_prompt(query, sections, history)
     response = model.generate_content(
         prompt, 
         stream=True, 
