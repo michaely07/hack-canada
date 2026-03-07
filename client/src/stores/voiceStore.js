@@ -3,10 +3,17 @@ import { create } from 'zustand'
 export const useVoiceStore = create((set) => ({
   isActive: false,
   isConnecting: false,
+<<<<<<< HEAD
   isSpeaking: false,
   isListening: false,
   transcript: '',
   agentText: '',
+=======
+  isSpeaking: false,       // AI is currently speaking
+  isListening: false,      // Mic is active, user can speak
+  transcript: '',          // Current user transcript
+  agentText: '',           // Current agent response text
+>>>>>>> origin/elevenlabs
   error: null,
 
   setActive: (active) => set({ isActive: active }),
