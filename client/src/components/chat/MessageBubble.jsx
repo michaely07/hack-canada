@@ -37,16 +37,18 @@ export default function MessageBubble({ message }) {
                 <CitationBadge key={i} citation={c} />
               ))}
             </div>
-            <button
-              onClick={handleCopy}
-              className="ml-4 shrink-0 flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors"
-              style={{
-                color: copied ? 'var(--green)' : 'var(--text-secondary)',
-                background: 'rgba(255,255,255,0.05)'
-              }}
-            >
-              {copied ? 'Copied' : 'Cite This'}
-            </button>
+            <div className="ml-4 shrink-0 flex items-center gap-2">
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors"
+                style={{
+                  color: copied ? 'var(--green)' : 'var(--text-secondary)',
+                  background: 'rgba(255,255,255,0.05)'
+                }}
+              >
+                {copied ? 'Copied' : 'Copy Text'}
+              </button>
+            </div>
           </div>
         )}
       </div>

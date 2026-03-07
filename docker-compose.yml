@@ -30,6 +30,7 @@ services:
     volumes:
       - ./api:/app/api
       - ./etl:/app/etl
+      - ./laws-lois-xml:/app/laws-lois-xml
 
 volumes:
   pgdata:
