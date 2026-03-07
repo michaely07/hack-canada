@@ -30,7 +30,12 @@ async def lifespan(app: FastAPI):
     migration_path = os.path.join(os.path.dirname(__file__), "..", "migrations", "001_init.sql")
     if os.path.exists(migration_path):
         migration_sql = open(migration_path).read()
-        await pool.execute(migration_sql)
+        # asyncpg execute() only supports single statements — split on semicolons
+        async with pool.acquire() as conn:
+            for statement in migration_sql.split(";"):
+                stmt = statement.strip()
+                if stmt and not stmt.startswith("--"):
+                    await conn.execute(stmt)
         logger.info("Migrations applied successfully")
 
     init_embedder(settings.EMBEDDING_MODEL)
