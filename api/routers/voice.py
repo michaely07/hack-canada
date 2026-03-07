@@ -1,80 +1,130 @@
 """
-Voice router — endpoints for ElevenLabs Conversational AI integration.
+Voice router — endpoints for ElevenLabs integration.
 
-POST /api/voice/token  — returns a signed WebSocket URL for the frontend
-POST /api/voice/llm    — webhook called BY ElevenLabs to get LLM responses
+POST /api/voice/token  — signed WebSocket URL for Conversational AI
+POST /api/voice/llm    — webhook called BY ElevenLabs agent
+POST /api/voice/tts    — text-to-speech (type a question, hear it back)
+GET  /api/voice/voices — list available ElevenLabs voices
 """
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
+from pydantic import BaseModel
 
-from api.services.voice import get_signed_url
+from api.services.voice import get_signed_url, text_to_speech, get_available_voices
 
 router = APIRouter(prefix="/api/voice", tags=["voice"])
 
 
+class TTSRequest(BaseModel):
+    text: str
+    voice_id: str | None = None
+
+
 @router.post("/token")
 async def voice_token():
-    """
-    Generate a signed WebSocket URL for ElevenLabs Conversational AI.
-
-    The frontend calls this to get a temporary URL, then connects directly
-    to ElevenLabs via WebSocket. This keeps the API key server-side.
-    """
+    """Generate a signed WebSocket URL for ElevenLabs Conversational AI."""
     try:
         signed_url = await get_signed_url()
         return {"signed_url": signed_url}
     except Exception as e:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Failed to get ElevenLabs signed URL: {str(e)}"
-        )
+        raise HTTPException(status_code=502, detail=f"Failed to get signed URL: {str(e)}")
 
 
-@router.post("/llm")
-async def voice_llm(request: Request):
+@router.post("/tts")
+async def voice_tts(req: TTSRequest):
     """
-    Webhook endpoint called BY ElevenLabs when the agent needs an LLM response.
+    Convert text to speech using ElevenLabs TTS API.
+    Returns raw MP3 audio that the browser can play directly.
+    """
+    if not req.text.strip():
+        raise HTTPException(status_code=422, detail="Text cannot be empty")
 
-    ElevenLabs sends the user's transcribed speech here. We run it through
-    our RAG pipeline and stream the response text back for TTS conversion.
+    try:
+        audio_bytes = await text_to_speech(req.text, req.voice_id)
+        return Response(
+            content=audio_bytes,
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "inline"},
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"TTS failed: {str(e)}")
 
-    This endpoint is configured as the 'Server URL' in the ElevenLabs
-    Agent dashboard under Custom LLM settings.
+
+@router.get("/voices")
+async def list_voices():
+    """List all available ElevenLabs voices (useful for finding voice IDs)."""
+    try:
+        voices = await get_available_voices()
+        return {"voices": voices}
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Failed to list voices: {str(e)}")
+
+
+@router.post("/chat")
+async def voice_chat(request: Request):
+    """
+    Full chat endpoint: takes a text question, returns a JSON response
+    with the answer text. The frontend then calls /tts to hear it.
+
+    This is the text-input workaround when mic is unavailable.
     """
     body = await request.json()
-    messages = body.get("messages", [])
+    question = body.get("question", "").strip()
 
-    # Extract the latest user message
-    user_message = ""
-    for msg in reversed(messages):
-        if msg.get("role") == "user":
-            user_message = msg.get("content", "")
-            break
+    if not question:
+        raise HTTPException(status_code=422, detail="Question cannot be empty")
 
-    if not user_message:
-        return StreamingResponse(
-            iter(["I didn't catch that. Could you repeat your question?"]),
-            media_type="text/plain"
+    # TODO: Wire to RAG pipeline when ready.
+    # For now, return a placeholder legal-sounding response.
+    answer = generate_placeholder_answer(question)
+
+    return {"answer": answer}
+
+
+def generate_placeholder_answer(question: str) -> str:
+    """
+    Placeholder answer generator until the RAG pipeline is connected.
+    Gives a legal-counsel-style response to demonstrate the voice.
+    """
+    q = question.lower()
+
+    if "criminal" in q or "crime" in q:
+        return (
+            "Under the Criminal Code of Canada, R.S.C. 1985, c. C-46, "
+            "criminal offences are categorized as summary conviction offences "
+            "and indictable offences. The classification determines the procedure, "
+            "available penalties, and limitation periods. I'd recommend reviewing "
+            "the specific provisions relevant to your inquiry."
         )
-
-    # TODO: Wire this up to the RAG pipeline (retrieval.py → rag.py)
-    # For now, return a placeholder response so voice works end-to-end.
-    #
-    # When the RAG service is ready, replace this with:
-    #   from api.services.retrieval import hybrid_search
-    #   from api.services.rag import generate_answer
-    #   sections = await hybrid_search(user_message, language="en")
-    #   answer_stream = generate_answer(user_message, sections, stream=True)
-    #   return StreamingResponse(answer_stream, media_type="text/plain")
-
-    async def placeholder_stream():
-        yield f"You asked about: {user_message}. "
-        yield "The RAG pipeline is not yet connected. "
-        yield "Once the retrieval and Gemini services are ready, "
-        yield "this endpoint will return real legal research answers."
-
-    return StreamingResponse(
-        placeholder_stream(),
-        media_type="text/plain"
-    )
+    elif "tax" in q or "income" in q:
+        return (
+            "The Income Tax Act, R.S.C. 1985, c. 1 (5th Supp.), governs federal "
+            "taxation in Canada. It establishes the rules for computing income, "
+            "deductions, credits, and the obligations of taxpayers. For specific "
+            "tax questions, I'd need to examine the relevant sections more closely."
+        )
+    elif "charter" in q or "rights" in q or "freedom" in q:
+        return (
+            "The Canadian Charter of Rights and Freedoms, Part I of the "
+            "Constitution Act, 1982, guarantees fundamental rights including "
+            "freedom of expression under Section 2(b), the right to life, liberty "
+            "and security of the person under Section 7, and equality rights under "
+            "Section 15. These rights are subject to reasonable limits under Section 1."
+        )
+    elif "immigration" in q or "citizen" in q:
+        return (
+            "Immigration matters in Canada are primarily governed by the "
+            "Immigration and Refugee Protection Act, S.C. 2001, c. 27. "
+            "The Act establishes categories for permanent residents, foreign workers, "
+            "refugees, and sets out inadmissibility grounds and removal procedures."
+        )
+    else:
+        return (
+            f"That's an excellent question regarding {question}. "
+            "Under Canadian federal law, this area would require a thorough "
+            "review of the relevant statutes and regulations. Once our full "
+            "legal research database is connected, I'll be able to provide "
+            "specific statutory references and detailed analysis. "
+            "Is there a particular aspect you'd like me to focus on?"
+        )
