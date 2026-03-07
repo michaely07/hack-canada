@@ -1,5 +1,41 @@
 import { create } from 'zustand'
 
+/**
+ * Extract the answer text from a partial JSON string being streamed.
+ * Gemini outputs: {"answer": "text...", "citations": [...]}
+ * We pull out just the answer value for clean display during streaming.
+ */
+function extractAnswerFromPartialJson(raw) {
+  const marker = '"answer"'
+  const idx = raw.indexOf(marker)
+  if (idx === -1) return null
+
+  const afterKey = raw.indexOf(':', idx + marker.length)
+  if (afterKey === -1) return null
+
+  const rest = raw.substring(afterKey + 1).trimStart()
+  if (rest.startsWith('null')) return null
+  if (!rest.startsWith('"')) return null
+
+  let text = ''
+  let i = 1 // skip opening quote
+  while (i < rest.length) {
+    if (rest[i] === '\\' && i + 1 < rest.length) {
+      const next = rest[i + 1]
+      if (next === 'n') { text += '\n'; i += 2; continue }
+      if (next === 't') { text += '\t'; i += 2; continue }
+      if (next === '"') { text += '"'; i += 2; continue }
+      if (next === '\\') { text += '\\'; i += 2; continue }
+      text += next; i += 2; continue
+    }
+    if (rest[i] === '"') break
+    text += rest[i]
+    i++
+  }
+
+  return text || null
+}
+
 export const useChatStore = create((set, get) => ({
   messages: [],
   isLoading: false,
@@ -12,10 +48,9 @@ export const useChatStore = create((set, get) => ({
 
   setLoading: (loading) => set({ isLoading: loading }),
   setStreamingContent: (content) => set({ streamingContent: content }),
-  appendStreamingContent: (text) => set(s => ({ streamingContent: s.streamingContent + text })),
 
   sendQuery: async (query, lawCode = null) => {
-    const { addMessage, setLoading, setStreamingContent, appendStreamingContent } = get()
+    const { addMessage, setLoading, setStreamingContent } = get()
     addMessage({ role: 'user', content: query })
     setLoading(true)
     setStreamingContent('')
@@ -26,6 +61,10 @@ export const useChatStore = create((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query, language: 'en', law_code: lawCode }),
       })
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -51,7 +90,10 @@ export const useChatStore = create((set, get) => ({
             const event = JSON.parse(jsonStr)
             if (event.type === 'token') {
               fullText += event.data
-              appendStreamingContent(event.data)
+              const displayText = extractAnswerFromPartialJson(fullText)
+              if (displayText) {
+                setStreamingContent(displayText)
+              }
             } else if (event.type === 'citations') {
               citations = event.data || []
             } else if (event.type === 'confidence') {
@@ -61,18 +103,29 @@ export const useChatStore = create((set, get) => ({
         }
       }
 
-      // Parse the JSON answer from the streamed text
+      // Parse the complete JSON to extract final answer + citations
       let answer = fullText
       try {
-        const parsed = JSON.parse(fullText)
-        answer = parsed.answer || fullText
+        let raw = fullText.trim()
+        if (raw.startsWith('```')) {
+          raw = raw.split('\n', 1)[1]
+          raw = raw.substring(0, raw.lastIndexOf('```')).trim()
+        }
+        const parsed = JSON.parse(raw)
+        answer = parsed.answer || null
         if (!citations.length && parsed.citations) {
           citations = parsed.citations
         }
         if (parsed.confidence) {
           confidence = parsed.confidence
         }
-      } catch {}
+      } catch {
+        // JSON parse failed — extract answer from partial JSON as fallback
+        const extracted = extractAnswerFromPartialJson(fullText)
+        if (extracted) {
+          answer = extracted
+        }
+      }
 
       setStreamingContent('')
       addMessage({
