@@ -56,4 +56,6 @@ async def health():
     }
 
 # Serve React static build in production
-# app.mount("/", StaticFiles(directory="static", html=True), name="static")
+import os
+if os.path.isdir("static"):
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")

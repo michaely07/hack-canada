@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+:root {
+  --navy: #0A1628;
+  --navy-light: #132240;
+  --navy-lighter: #1A3058;
+  --gold: #C9A84C;
+  --gold-dim: #9A7D3A;
+  --text-primary: #E8E4DC;
+  --text-secondary: #9BA4B5;
+  --red: #C23B22;
+  --green: #4A9D5B;
+}
+
+body {
+  background: var(--navy);
+  color: var(--text-primary);
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+h1, h2, h3, h4 { font-family: 'Crimson Pro', serif; }
+code, .mono { font-family: 'IBM Plex Mono', monospace; }

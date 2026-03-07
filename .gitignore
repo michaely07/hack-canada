@@ -30,5 +30,8 @@ Thumbs.db
 client/node_modules/
 client/dist/
 
+# Virtual environment
+.venv/
+
 # Docker volumes
 pgdata/

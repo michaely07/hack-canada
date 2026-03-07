@@ -1,0 +1,14 @@
+.venv
+.env
+.git
+__pycache__
+*.pyc
+client/node_modules
+client/dist
+laws-lois-xml
+pgdata
+.DS_Store
+Thumbs.db
+Docs
+*.md
+!requirements.txt

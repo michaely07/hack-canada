@@ -1,6 +1,24 @@
 # CHANGELOG
 
-## Status: DB + ETL + Backend merged and tested
+## Status: Full-stack integrated and running in Docker
+
+### [2026-03-07] Frontend + Voice + Docker integration
+
+- Merged `front-end` branch into `client/` subdirectory (React + Vite + Tailwind)
+- Merged `elevenlabs` branch voice components (VoiceButton, VoiceSession, AudioVisualizer, voiceStore)
+- Fixed Vite proxy from port 8000 to 8001
+- Removed DummyTest component, cleaned up App.jsx
+- Added SSE streaming support in chatStore (reads `/api/query/stream` events)
+- Added law filter dropdown in QueryInput (fetches from `GET /api/laws`)
+- Added auto-scroll on new messages and streaming content
+- Added `api/services/voice.py` for ElevenLabs signed URL generation
+- Added multi-stage Dockerfile (Node frontend build + Python backend)
+- Added `api` service to `docker-compose.yml` with healthcheck on db
+- Added `.dockerignore` for clean builds
+- Added `.venv/` to `.gitignore`
+- Enabled conditional static file serving in `api/main.py` (serves React build if `static/` exists)
+- Verified: `docker compose up` runs both db + api, `/api/health` returns ok (6 laws, 2,767 sections)
+- Verified: Frontend builds and is served at `/` by FastAPI in production mode
 
 ### [2026-03-07] Backend merge
 
@@ -30,13 +48,9 @@ postgresql://dev:dev@localhost:5433/statutelens
 - `GET /api/laws` — all 6 laws with section counts
 - `GET /api/laws/{code}` — single law with section list
 - `GET /api/sections/{lims_id}` — full section with XML
-- `POST /api/query` — RAG query (needs GEMINI_API_KEY)
+- `POST /api/query` — RAG query
 - `POST /api/query/stream` — SSE streaming RAG query
 - `GET /api/graph/{code}` — cross-reference graph
 - `POST /api/voice/token` — ElevenLabs signed URL
+- `POST /api/voice/llm` — ElevenLabs custom LLM endpoint
 - `POST /api/conversations` — create conversation
-
-### Next steps
-- [ ] Set GEMINI_API_KEY in `.env` and test `/api/query`
-- [ ] Run `--full` if more coverage needed for demo
-- [ ] Frontend integration
