@@ -23,7 +23,7 @@ router = APIRouter(prefix="/api/voice", tags=["voice"])
 
 if settings.GEMINI_API_KEY:
     genai.configure(api_key=settings.GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel("gemini-2.5-flash")
+    gemini_model = genai.GenerativeModel("gemini-2.0-flash")
 
 class TTSRequest(BaseModel):
     text: str

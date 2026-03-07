@@ -114,6 +114,7 @@ export const useChatStore = create((set, get) => ({
       let fullText = ''
       let citations = []
       let confidence = 'low'
+      let streamError = null
 
       while (true) {
         const { done, value } = await reader.read()
@@ -137,6 +138,9 @@ export const useChatStore = create((set, get) => ({
               citations = event.data || []
             } else if (event.type === 'confidence') {
               confidence = event.data || 'low'
+            } else if (event.detail) {
+              // Backend error event (e.g., Gemini rate limit)
+              streamError = event.detail
             }
           } catch {}
         }
@@ -157,7 +161,12 @@ export const useChatStore = create((set, get) => ({
 
       setStreamingContent('')
 
-      const finalAnswer = answer || 'I could not find relevant information in the federal statutes.'
+      let finalAnswer
+      if (streamError) {
+        finalAnswer = 'The AI service is temporarily busy. Please wait a moment and try again.'
+      } else {
+        finalAnswer = answer || 'I could not find relevant information in the federal statutes.'
+      }
 
       addMessage({
         role: 'assistant',
@@ -166,8 +175,8 @@ export const useChatStore = create((set, get) => ({
         confidence,
       })
 
-      // Auto-play the final answer via TTS
-      get().playMessageAudio(finalAnswer)
+      // Fire-and-forget TTS — must NOT affect the query pipeline
+      try { get().playMessageAudio(finalAnswer) } catch {}
     } catch (err) {
       setStreamingContent('')
       addMessage({

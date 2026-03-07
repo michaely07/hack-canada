@@ -14,8 +14,12 @@ export default function StatusBar() {
   }[confidence] || 'var(--text-secondary)'
 
   return (
-    <div className="flex items-center justify-between px-6 py-2 text-xs border-t"
-         style={{ borderColor: 'var(--navy-lighter)', color: 'var(--text-secondary)' }}>
+    <div className="flex items-center justify-between px-6 py-2 text-xs"
+         style={{
+           borderTop: '1px solid rgba(201, 168, 76, 0.12)',
+           color: 'var(--text-secondary)',
+           fontFamily: "'Lora', serif",
+         }}>
       <div className="flex items-center gap-4">
         {confidence && (
           <span>
@@ -26,7 +30,9 @@ export default function StatusBar() {
           <span>{citationCount} section{citationCount !== 1 ? 's' : ''} cited</span>
         )}
       </div>
-      <span>Powered by Gemini + Canadian Federal Law XML</span>
+      <span style={{ color: 'var(--gold-dim)', letterSpacing: '0.03em' }}>
+        Powered by Gemini + Canadian Federal Law XML
+      </span>
     </div>
   )
 }
