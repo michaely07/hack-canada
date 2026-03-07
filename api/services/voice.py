@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-"""ElevenLabs voice service — signed URL generation for Conversational AI WebSocket."""
-
-import httpx
-=======
 """
 ElevenLabs voice service — handles:
   1. Signed URL generation for Conversational AI WebSocket
@@ -10,20 +5,10 @@ ElevenLabs voice service — handles:
 """
 
 import httpx
-
->>>>>>> origin/elevenlabs
 from api.config import settings
 
 
 async def get_signed_url() -> str:
-<<<<<<< HEAD
-    """Request a signed WebSocket URL from ElevenLabs for the configured agent."""
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            "https://api.elevenlabs.io/v1/convai/conversation/get_signed_url",
-            params={"agent_id": settings.elevenlabs_agent_id},
-            headers={"xi-api-key": settings.elevenlabs_api_key},
-=======
     """
     Request a signed WebSocket URL from ElevenLabs for the configured agent.
     """
@@ -34,13 +19,10 @@ async def get_signed_url() -> str:
             headers={
                 "xi-api-key": settings.ELEVENLABS_API_KEY,
             },
->>>>>>> origin/elevenlabs
         )
         response.raise_for_status()
         data = response.json()
         return data["signed_url"]
-<<<<<<< HEAD
-=======
 
 
 async def text_to_speech(text: str, voice_id: str | None = None) -> bytes:
@@ -74,7 +56,12 @@ async def text_to_speech(text: str, voice_id: str | None = None) -> bytes:
                 },
             },
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            print(f"ELEVENLABS API ERROR: {e.response.text}", flush=True)
+            raise e
+
         return response.content
 
 
@@ -96,4 +83,3 @@ async def get_available_voices() -> list[dict]:
             {"voice_id": v["voice_id"], "name": v["name"], "category": v.get("category", "")}
             for v in data.get("voices", [])
         ]
->>>>>>> origin/elevenlabs

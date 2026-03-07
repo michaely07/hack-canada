@@ -1,66 +1,3 @@
-<<<<<<< HEAD
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import StreamingResponse
-from api.config import settings
-from api.db import get_pool
-from api.services.retrieval import hybrid_search
-from api.services.rag import build_prompt
-from api.models.schemas import VoiceTokenResponse
-import httpx
-import json
-import google.generativeai as genai
-
-router = APIRouter()
-
-genai.configure(api_key=settings.gemini_api_key)
-gemini_model = genai.GenerativeModel("gemini-2.5-flash")
-
-@router.post("/voice/token", response_model=VoiceTokenResponse)
-async def get_voice_token():
-    """Generate signed URL for ElevenLabs WebSocket (keeps API key server-side)."""
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(
-            "https://api.elevenlabs.io/v1/convai/conversation/get_signed_url",
-            params={"agent_id": settings.elevenlabs_agent_id},
-            headers={"xi-api-key": settings.elevenlabs_api_key},
-        )
-        resp.raise_for_status()
-        return resp.json()
-
-@router.post("/voice/llm")
-async def voice_llm(request: Request):
-    """Called BY ElevenLabs agent as 'custom LLM'. Receives transcript, returns streamed text."""
-    body = await request.json()
-    messages = body.get("messages", [])
-    user_message = messages[-1].get("content", "") if messages else ""
-    
-    if not user_message.strip():
-        # Empty audio or payload
-        async def empty_generate():
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(empty_generate(), media_type="text/event-stream")
-
-    pool = get_pool()
-    sections = await hybrid_search(user_message, pool, top_k=5)
-
-    prompt = build_prompt(user_message, sections)
-
-    # ElevenLabs expects OpenAI-compatible SSE format
-    async def generate():
-        try:
-            response = gemini_model.generate_content(prompt, stream=True)
-            for chunk in response:
-                if chunk.text:
-                    # OpenAI SSE format for compatibility with ElevenLabs
-                    data = {"choices": [{"delta": {"content": chunk.text}}]}
-                    yield f"data: {json.dumps(data)}\n\n"
-            yield "data: [DONE]\n\n"
-        except Exception as e:
-            yield f"data: {json.dumps({'error': f'Gemini API error: {str(e)}'})}\n\n"
-            yield "data: [DONE]\n\n"
-
-    return StreamingResponse(generate(), media_type="text/event-stream")
-=======
 """
 Voice router — endpoints for ElevenLabs integration.
 
@@ -73,11 +10,20 @@ GET  /api/voice/voices — list available ElevenLabs voices
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse, Response
 from pydantic import BaseModel
+import json
 
 from api.services.voice import get_signed_url, text_to_speech, get_available_voices
+from api.db import get_pool
+from api.services.retrieval import hybrid_search
+from api.services.rag import build_prompt
+from api.config import settings
+import google.generativeai as genai
 
 router = APIRouter(prefix="/api/voice", tags=["voice"])
 
+if settings.GEMINI_API_KEY:
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    gemini_model = genai.GenerativeModel("gemini-2.5-flash")
 
 class TTSRequest(BaseModel):
     text: str
@@ -123,6 +69,40 @@ async def list_voices():
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Failed to list voices: {str(e)}")
 
+
+@router.post("/llm")
+async def voice_llm(request: Request):
+    """Called BY ElevenLabs agent as 'custom LLM'. Receives transcript, returns streamed text."""
+    body = await request.json()
+    messages = body.get("messages", [])
+    user_message = messages[-1].get("content", "") if messages else ""
+    
+    if not user_message.strip():
+        # Empty audio or payload
+        async def empty_generate():
+            yield "data: [DONE]\n\n"
+        return StreamingResponse(empty_generate(), media_type="text/event-stream")
+
+    pool = get_pool()
+    sections = await hybrid_search(user_message, pool, top_k=5)
+
+    prompt = build_prompt(user_message, sections)
+
+    # ElevenLabs expects OpenAI-compatible SSE format
+    async def generate():
+        try:
+            response = gemini_model.generate_content(prompt, stream=True)
+            for chunk in response:
+                if chunk.text:
+                    # OpenAI SSE format for compatibility with ElevenLabs
+                    data = {"choices": [{"delta": {"content": chunk.text}}]}
+                    yield f"data: {json.dumps(data)}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': f'Gemini API error: {str(e)}'})}\n\n"
+            yield "data: [DONE]\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 @router.post("/chat")
 async def voice_chat(request: Request):
@@ -191,4 +171,3 @@ def generate_placeholder_answer(question: str) -> str:
             "specific statutory references and detailed analysis. "
             "Is there a particular aspect you'd like me to focus on?"
         )
->>>>>>> origin/elevenlabs
