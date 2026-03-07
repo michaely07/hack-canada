@@ -124,6 +124,8 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  clearConversation: () => set({ messages: [], conversationId: null, streamingContent: '' }),
+
   sendQuery: async (query, lawCode = null) => {
     const { addMessage, setLoading, setStreamingContent } = get()
 
@@ -140,7 +142,7 @@ export const useChatStore = create((set, get) => ({
       const res = await fetch('/api/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, language: 'en', law_code: lawCode }),
+        body: JSON.stringify({ query, language: 'en', law_code: lawCode, conversation_id: get().conversationId }),
       })
 
       if (!res.ok) {
@@ -170,7 +172,9 @@ export const useChatStore = create((set, get) => ({
 
           try {
             const event = JSON.parse(jsonStr)
-            if (event.type === 'token') {
+            if (event.type === 'conversation_id') {
+              set({ conversationId: event.data })
+            } else if (event.type === 'token') {
               fullText += event.data
               const displayText = extractAnswerFromPartialJson(fullText)
               if (displayText) {
