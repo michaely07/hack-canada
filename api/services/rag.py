@@ -4,7 +4,7 @@ from api.services.retrieval import SectionResult
 from groq import AsyncGroq
 
 client = AsyncGroq(api_key=settings.GROQ_API_KEY)
-MODEL_NAME = "llama3-8b-8192"
+MODEL_NAME = "llama-3.1-8b-instant"
 
 SYSTEM_PROMPT = """You're a Canadian law expert chatting with someone who has legal questions. Talk like a real person — the way a smart friend who happens to be a lawyer would explain things. Short sentences. Contractions. No stiff language.
 
@@ -54,7 +54,7 @@ async def reformulate_query(query: str, history: list[dict] | None = None) -> st
     
     try:
         response = await client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
             max_tokens=100
