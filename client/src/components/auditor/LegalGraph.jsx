@@ -115,7 +115,7 @@ export default function LegalGraph() {
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.5}
       >
-        <Background color="#132240" gap={16} />
+        <Background color="#3D2828" gap={16} />
         <Controls />
       </ReactFlow>
       <div className="absolute top-4 left-4 p-3 rounded-lg border text-xs bg-opacity-80 backdrop-blur z-10"

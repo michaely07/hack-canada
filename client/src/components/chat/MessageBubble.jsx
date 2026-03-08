@@ -47,7 +47,7 @@ export default function MessageBubble({ message }) {
                 className="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors relative"
                 style={{
                   color: isPlayingThisMessage ? 'var(--gold)' : 'var(--text-secondary)',
-                  background: isPlayingThisMessage ? 'rgba(201, 168, 76, 0.1)' : 'rgba(255,255,255,0.05)'
+                  background: isPlayingThisMessage ? 'rgba(196, 91, 91, 0.1)' : 'rgba(255,255,255,0.05)'
                 }}
               >
                 {isPlayingThisMessage ? (

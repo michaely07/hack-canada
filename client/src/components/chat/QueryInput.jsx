@@ -92,7 +92,7 @@ export default function QueryInput() {
                   }}
                   className="w-full text-left px-3 py-2 text-sm hover:bg-opacity-50 transition-colors"
                   style={{
-                    background: !lawCode ? 'rgba(201, 168, 76, 0.1)' : 'transparent',
+                    background: !lawCode ? 'rgba(196, 91, 91, 0.1)' : 'transparent',
                     color: !lawCode ? 'var(--gold)' : 'var(--text-primary)'
                   }}
                 >
@@ -114,7 +114,7 @@ export default function QueryInput() {
                       }}
                       className="w-full text-left px-3 py-2 text-sm hover:bg-opacity-50 transition-colors truncate"
                       style={{
-                        background: lawCode === law.code ? 'rgba(201, 168, 76, 0.1)' : 'transparent',
+                        background: lawCode === law.code ? 'rgba(196, 91, 91, 0.1)' : 'transparent',
                         color: lawCode === law.code ? 'var(--gold)' : 'var(--text-primary)'
                       }}
                       title={law.short_title_en}
@@ -138,19 +138,19 @@ export default function QueryInput() {
           disabled={isLoading}
           className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none transition-all duration-300"
           style={{
-            background: 'rgba(26, 48, 88, 0.4)', // Slightly transparent var(--navy-lighter)
+            background: 'rgba(80, 54, 54, 0.4)', // Slightly transparent var(--navy-lighter)
             color: 'var(--text-primary)',
             border: '1px solid var(--navy-lighter)',
             boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
           }}
           onFocus={e => {
             e.target.style.borderColor = 'var(--gold-dim)'
-            e.target.style.background = 'rgba(26, 48, 88, 0.6)'
+            e.target.style.background = 'rgba(80, 54, 54, 0.6)'
             e.target.style.boxShadow = '0 0 0 1px var(--gold-dim), inset 0 2px 4px rgba(0,0,0,0.1)'
           }}
           onBlur={e => {
             e.target.style.borderColor = 'var(--navy-lighter)'
-            e.target.style.background = 'rgba(26, 48, 88, 0.4)'
+            e.target.style.background = 'rgba(80, 54, 54, 0.4)'
             e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.1)'
           }}
         />
@@ -160,7 +160,7 @@ export default function QueryInput() {
           className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-lg flex items-center gap-2 ${input.trim() ? 'hover:-translate-y-0.5 hover:shadow-xl' : ''}`}
           style={{
             background: input.trim() ? 'linear-gradient(135deg, var(--gold), var(--gold-dim))' : 'var(--navy-lighter)',
-            color: input.trim() ? '#112240' : 'var(--text-secondary)',
+            color: input.trim() ? '#2B1A1A' : 'var(--text-secondary)',
             border: `1px solid ${input.trim() ? 'transparent' : 'var(--navy-lighter)'}`,
             opacity: isLoading ? 0.7 : 1
           }}

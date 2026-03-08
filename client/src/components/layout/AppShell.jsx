@@ -14,13 +14,13 @@ export default function AppShell() {
   const personaTints = {
     assertive: 'radial-gradient(ellipse at top right, rgba(194,59,34,0.15), transparent 50%)',
     analytical: 'radial-gradient(ellipse at top right, rgba(74,157,91,0.15), transparent 50%)',
-    empathetic: 'radial-gradient(ellipse at top right, rgba(201,168,76,0.15), transparent 50%)'
+    empathetic: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.15), transparent 50%)'
   }
 
   const personaAccents = {
-    assertive: { primary: '#C23B22', dim: '#992B16' },  // Sharp Red
-    analytical: { primary: '#4A9D5B', dim: '#357A43' }, // Methodical Teal/Green
-    empathetic: { primary: '#C9A84C', dim: '#9A7D3A' }  // Trustworthy Gold (Default)
+    assertive: { primary: '#C23B22', dim: '#992B16' },
+    analytical: { primary: '#4A9D5B', dim: '#357A43' },
+    empathetic: { primary: '#C45B5B', dim: '#A04848' }
   }
 
   // Handle global theme override
@@ -102,7 +102,7 @@ export default function AppShell() {
                   onClick={() => handlePresetChange(p.id)}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
                   style={{
-                    background: activePreset === p.id ? 'rgba(201, 168, 76, 0.15)' : 'transparent',
+                    background: activePreset === p.id ? 'rgba(196, 91, 91, 0.15)' : 'transparent',
                     color: activePreset === p.id ? 'var(--gold)' : 'var(--text-secondary)',
                     border: `1px solid ${activePreset === p.id ? 'var(--gold-dim)' : 'var(--navy-lighter)'}`,
                   }}

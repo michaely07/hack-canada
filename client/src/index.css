@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --navy: #0A1628;
-  --navy-light: #132240;
-  --navy-lighter: #1A3058;
-  --gold: #C9A84C;
-  --gold-dim: #9A7D3A;
-  --text-primary: #E8E4DC;
-  --text-secondary: #9BA4B5;
+  --navy: #2B1A1A;
+  --navy-light: #3D2828;
+  --navy-lighter: #503636;
+  --gold: #C45B5B;
+  --gold-dim: #A04848;
+  --text-primary: #F0E4E0;
+  --text-secondary: #B59A96;
   --red: #C23B22;
   --green: #4A9D5B;
 }
@@ -17,7 +17,7 @@
 }
 
 body {
-  background: radial-gradient(circle at 30% 50%, #112240 0%, var(--navy) 100%);
+  background: radial-gradient(circle at 30% 50%, #3A2222 0%, var(--navy) 100%);
   color: var(--text-primary);
   font-family: 'Lora', serif;
   position: relative;
