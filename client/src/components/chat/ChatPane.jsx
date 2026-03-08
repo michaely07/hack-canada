@@ -29,15 +29,7 @@ export default function ChatPane() {
         {messages.map(msg => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
-        {isLoading && streamingContent && (
-          <div className="flex justify-start">
-            <div className="max-w-[85%] rounded-lg px-4 py-3 text-sm leading-relaxed"
-              style={{ background: 'var(--navy-light)', borderLeft: '3px solid var(--gold-dim)' }}>
-              <div className="whitespace-pre-wrap">{streamingContent}</div>
-            </div>
-          </div>
-        )}
-        {isLoading && !streamingContent && (
+        {isLoading && (
           <div className="flex gap-1 px-4 py-2">
             <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--gold)', animationDelay: '0ms' }} />
             <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--gold)', animationDelay: '150ms' }} />

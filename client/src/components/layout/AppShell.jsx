@@ -3,12 +3,32 @@ import ChatPane from '../chat/ChatPane'
 import AuditorPane from '../auditor/AuditorPane'
 import StatusBar from './StatusBar'
 import { useChatStore } from '../../stores/chatStore'
+import { useAuditorStore } from '../../stores/auditorStore'
 
 export default function AppShell() {
-  const [activeTab, setActiveTab] = useState('source')
+  const { activeTab, setActiveTab } = useAuditorStore()
   const { isAudioPlaying, stopAudio, setSelectedVoiceId, setSelectedPresetId } = useChatStore()
   const [presets, setPresets] = useState([])
   const [activePreset, setActivePreset] = useState('')
+
+  const personaTints = {
+    assertive: 'radial-gradient(ellipse at top right, rgba(194,59,34,0.15), transparent 50%)',
+    analytical: 'radial-gradient(ellipse at top right, rgba(74,157,91,0.15), transparent 50%)',
+    empathetic: 'radial-gradient(ellipse at top right, rgba(201,168,76,0.15), transparent 50%)'
+  }
+
+  const personaAccents = {
+    assertive: { primary: '#C23B22', dim: '#992B16' },  // Sharp Red
+    analytical: { primary: '#4A9D5B', dim: '#357A43' }, // Methodical Teal/Green
+    empathetic: { primary: '#C9A84C', dim: '#9A7D3A' }  // Trustworthy Gold (Default)
+  }
+
+  // Handle global theme override
+  useEffect(() => {
+    const accents = personaAccents[activePreset] || personaAccents.empathetic
+    document.documentElement.style.setProperty('--gold', accents.primary)
+    document.documentElement.style.setProperty('--gold-dim', accents.dim)
+  }, [activePreset])
 
   useEffect(() => {
     fetch('/api/voice/presets')
@@ -34,9 +54,17 @@ export default function AppShell() {
   }
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: 'var(--navy)' }}>
-      <header className="flex items-center justify-between px-6 py-3 border-b"
-        style={{ borderColor: 'var(--navy-lighter)' }}>
+    <div className="h-screen flex flex-col relative overflow-hidden bg-transparent">
+      {/* Persona Tint Background Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out"
+        style={{
+          background: personaTints[activePreset] || 'transparent',
+          zIndex: 0
+        }}
+      />
+
+      <header className="flex items-center justify-between px-6 py-3 relative z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-semibold" style={{ color: 'var(--gold)' }}>
@@ -88,30 +116,59 @@ export default function AppShell() {
         )}
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-2/5 border-r flex flex-col"
-          style={{ borderColor: 'var(--navy-lighter)' }}>
+      {/* Glowing Horizontal Separation Bar */}
+      <div className="w-full h-[1px] relative z-20"
+        style={{
+          background: 'linear-gradient(to right, transparent, var(--gold-dim), transparent)',
+          opacity: 0.5,
+          boxShadow: '0 0 8px var(--gold-dim)'
+        }}
+      />
+
+      <div className="flex flex-1 overflow-hidden relative z-10">
+        <div className="w-[60%] flex flex-col relative">
           <ChatPane />
+          {/* Glowing Divider */}
+          <div className="absolute right-0 top-0 bottom-0 w-[1px]"
+            style={{
+              background: 'linear-gradient(to bottom, transparent, var(--gold-dim), transparent)',
+              opacity: 0.3,
+              boxShadow: '0 0 8px var(--gold-dim)'
+            }}
+          />
         </div>
 
-        <div className="w-3/5 flex flex-col">
-          <div className="flex border-b" style={{ borderColor: 'var(--navy-lighter)' }}>
+        <div className="w-[40%] flex flex-col bg-opacity-50" style={{ background: 'var(--navy-light)' }}>
+          <div className="flex border-b" style={{ borderColor: 'var(--navy-lighter)', background: 'var(--navy)' }}>
             <button
               onClick={() => setActiveTab('source')}
-              className={`px-4 py-2 text-sm font-medium ${activeTab === 'source' ? 'border-b-2' : ''}`}
+              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'source' ? 'border-b-2' : 'hover:bg-white/5'}`}
               style={{
                 borderColor: activeTab === 'source' ? 'var(--gold)' : 'transparent',
                 color: activeTab === 'source' ? 'var(--gold)' : 'var(--text-secondary)',
+                opacity: activeTab === 'source' ? 1 : 0.7
               }}
             >
               Source Viewer
             </button>
             <button
+              onClick={() => setActiveTab('analysis')}
+              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'analysis' ? 'border-b-2' : 'hover:bg-white/5'}`}
+              style={{
+                borderColor: activeTab === 'analysis' ? 'var(--gold)' : 'transparent',
+                color: activeTab === 'analysis' ? 'var(--gold)' : 'var(--text-secondary)',
+                opacity: activeTab === 'analysis' ? 1 : 0.7
+              }}
+            >
+              Analysis
+            </button>
+            <button
               onClick={() => setActiveTab('graph')}
-              className={`px-4 py-2 text-sm font-medium ${activeTab === 'graph' ? 'border-b-2' : ''}`}
+              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'graph' ? 'border-b-2' : 'hover:bg-white/5'}`}
               style={{
                 borderColor: activeTab === 'graph' ? 'var(--gold)' : 'transparent',
                 color: activeTab === 'graph' ? 'var(--gold)' : 'var(--text-secondary)',
+                opacity: activeTab === 'graph' ? 1 : 0.7
               }}
             >
               Legal Graph

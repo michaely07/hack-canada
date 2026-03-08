@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import CitationBadge from './CitationBadge'
+import { useChatStore } from '../../stores/chatStore'
 
 export default function MessageBubble({ message }) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
+  const { playMessageAudio, stopAudio, isAudioPlaying, playingMessageId } = useChatStore()
+
+  const isPlayingThisMessage = isAudioPlaying && playingMessageId === message.id
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content)
@@ -38,6 +42,24 @@ export default function MessageBubble({ message }) {
               ))}
             </div>
             <div className="ml-4 shrink-0 flex items-center gap-2">
+              <button
+                onClick={() => isPlayingThisMessage ? stopAudio() : playMessageAudio(message.content, message.id)}
+                className="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors relative"
+                style={{
+                  color: isPlayingThisMessage ? 'var(--gold)' : 'var(--text-secondary)',
+                  background: isPlayingThisMessage ? 'rgba(201, 168, 76, 0.1)' : 'rgba(255,255,255,0.05)'
+                }}
+              >
+                {isPlayingThisMessage ? (
+                  <div className="flex items-center gap-0.5 h-3">
+                    <span className="w-0.5 h-full bg-[var(--gold)] rounded-full animate-[waveform_1s_ease-in-out_infinite]" />
+                    <span className="w-0.5 h-[60%] bg-[var(--gold)] rounded-full animate-[waveform_1s_ease-in-out_infinite_0.2s]" />
+                    <span className="w-0.5 h-[80%] bg-[var(--gold)] rounded-full animate-[waveform_1s_ease-in-out_infinite_0.4s]" />
+                  </div>
+                ) : (
+                  <span>🔊 Read Aloud</span>
+                )}
+              </button>
               <button
                 onClick={handleCopy}
                 className="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors"

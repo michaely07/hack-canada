@@ -12,6 +12,7 @@ class Settings(BaseSettings):
 
     # LLM
     GEMINI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
 
     # Voice (ElevenLabs)
     ELEVENLABS_API_KEY: str = ""

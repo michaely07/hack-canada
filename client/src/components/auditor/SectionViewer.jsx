@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 
 export default function SectionViewer({ section }) {
   return (
@@ -23,9 +24,18 @@ export default function SectionViewer({ section }) {
         </div>
       </div>
 
-      <div className="text-sm leading-relaxed whitespace-pre-wrap mb-6"
-        style={{ color: 'var(--text-primary)' }}>
-        {section.content_text}
+      <div className="relative mb-6 p-3 -mx-3 rounded z-0" style={{ color: 'var(--text-primary)' }}>
+        <motion.div
+          key={`bg-${section.lims_id}`}
+          initial={{ opacity: 0.4 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute inset-0 rounded pointer-events-none -z-10"
+          style={{ backgroundColor: 'var(--gold)' }}
+        />
+        <div className="text-sm leading-relaxed whitespace-pre-wrap">
+          {section.content_text}
+        </div>
       </div>
 
       {section.content_xml && (

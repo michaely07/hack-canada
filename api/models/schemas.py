@@ -10,6 +10,9 @@ class QueryRequest(BaseModel):
     conversation_id: Optional[str] = None
     persona: Optional[str] = None
 
+class AnalyzeRequest(BaseModel):
+    lims_id: str
+
 class CitationSchema(BaseModel):
     lims_id: str
     label: str
@@ -29,6 +32,7 @@ class QueryResponse(BaseModel):
     confidence: str = "low"
     reason: Optional[str] = None
     retrieved_sections: Optional[List[RetrievedSectionSchema]] = None
+    conversation_id: Optional[str] = None
 
 # --- Laws ---
 class LawSummarySchema(BaseModel):

@@ -9,6 +9,7 @@ export const useChatStore = create((set, get) => ({
   conversationId: null,
   streamingContent: '',
   isAudioPlaying: false,
+  playingMessageId: null,
   audioPlaybackId: 0,
   selectedVoiceId: null,
   selectedPresetId: null,
@@ -34,18 +35,19 @@ export const useChatStore = create((set, get) => ({
     set(state => ({
       _audio: null,
       isAudioPlaying: false,
+      playingMessageId: null,
       audioPlaybackId: state.audioPlaybackId + 1
     }))
   },
 
-  playMessageAudio: async (text) => {
+  playMessageAudio: async (text, messageId) => {
     // Stop anything currently playing first
     get().stopAudio()
 
     const playId = get().audioPlaybackId
 
     try {
-      set({ isAudioPlaying: true })
+      set({ isAudioPlaying: true, playingMessageId: messageId })
 
       const res = await fetch('/api/voice/tts', {
         method: 'POST',
@@ -72,14 +74,14 @@ export const useChatStore = create((set, get) => ({
       audio.onended = () => {
         // Only update state if this is still the active playback
         if (get().audioPlaybackId === playId) {
-          set({ isAudioPlaying: false, _audio: null })
+          set({ isAudioPlaying: false, playingMessageId: null, _audio: null })
         }
         URL.revokeObjectURL(url)
       }
 
       audio.onerror = () => {
         if (get().audioPlaybackId === playId) {
-          set({ isAudioPlaying: false, _audio: null })
+          set({ isAudioPlaying: false, playingMessageId: null, _audio: null })
         }
         URL.revokeObjectURL(url)
       }
@@ -89,7 +91,7 @@ export const useChatStore = create((set, get) => ({
       // Only reset state if this playback session is still current
       if (get().audioPlaybackId === playId) {
         console.error('TTS playback error:', err)
-        set({ isAudioPlaying: false, _audio: null })
+        set({ isAudioPlaying: false, playingMessageId: null, _audio: null })
       }
     }
   },
@@ -110,7 +112,7 @@ export const useChatStore = create((set, get) => ({
       const res = await fetch('/api/query/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, language: 'en', law_code: lawCode, persona: get().selectedPresetId }),
+        body: JSON.stringify({ query, language: 'en', law_code: lawCode, persona: get().selectedPresetId, conversation_id: get().conversationId }),
       })
 
       const reader = res.body.getReader()
@@ -119,6 +121,7 @@ export const useChatStore = create((set, get) => ({
       let fullText = ''
       let citations = []
       let confidence = 'low'
+      let retrieved_sections = []
 
       while (true) {
         const { done, value } = await reader.read()
@@ -138,10 +141,14 @@ export const useChatStore = create((set, get) => ({
             if (event.type === 'token') {
               fullText += event.data
               appendStreamingContent(event.data)
+            } else if (event.type === 'retrieved_sections') {
+              retrieved_sections = event.data || []
             } else if (event.type === 'citations') {
               citations = event.data || []
             } else if (event.type === 'confidence') {
               confidence = event.data || 'low'
+            } else if (event.type === 'conversation_id') {
+              set({ conversationId: event.data })
             }
           } catch { }
         }
@@ -169,6 +176,7 @@ export const useChatStore = create((set, get) => ({
         content: finalAnswer,
         citations,
         confidence,
+        retrieved_sections,
       })
 
       // Auto-play the final answer via TTS
