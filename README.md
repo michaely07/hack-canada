@@ -9,7 +9,7 @@
 ```
 You ask a question
         ↓
-  Hybrid search (vector + full-text) finds the most relevant federal law sections based on real up-to-date data
+  Hybrid search (vector + full-text) finds most relevant federal law sections based on real up-to-date data
         ↓
   Backend reads those sections and writes a cited answer
         ↓
