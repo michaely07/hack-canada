@@ -1,0 +1,26 @@
+ff87565 HEAD@{0}: checkout: moving from main to elevenlabs
+8983f05 HEAD@{1}: checkout: moving from elevenlabs to main
+ff87565 HEAD@{2}: checkout: moving from main to elevenlabs
+8983f05 HEAD@{3}: checkout: moving from elevenlabs to main
+ff87565 HEAD@{4}: checkout: moving from main to elevenlabs
+8983f05 HEAD@{5}: pull: Fast-forward
+3410c00 HEAD@{6}: checkout: moving from elevenlabs to main
+ff87565 HEAD@{7}: commit: Implement Live RAG Graph and Laymans Translator Analysis Tab
+986c768 HEAD@{8}: reset: moving to origin/elevenlabs
+b897be9 HEAD@{9}: checkout: moving from main to elevenlabs
+3410c00 HEAD@{10}: pull: Fast-forward
+50d4f6d HEAD@{11}: checkout: moving from elevenlabs to main
+b897be9 HEAD@{12}: commit: UI and intelligence improvements.
+937e696 HEAD@{13}: commit: added personalities for each counsel
+b4c7b9f HEAD@{14}: commit: added multiple counsel options
+f8f68a9 HEAD@{15}: commit: modified gitignore
+a2a4781 HEAD@{16}: commit: removed cache files
+dc168c9 HEAD@{17}: commit: added Vite
+50d4f6d HEAD@{18}: reset: moving to origin/main
+13fc05e HEAD@{19}: checkout: moving from main to elevenlabs
+50d4f6d HEAD@{20}: checkout: moving from integration to main
+5ea1315 HEAD@{21}: reset: moving to HEAD
+5ea1315 HEAD@{22}: checkout: moving from elevenlabs to integration
+13fc05e HEAD@{23}: commit: Isoolated TTS/STT testing with Elevenlabs
+1ae8164 HEAD@{24}: commit: initial elevenlabs voice-side commit
+3449406 HEAD@{25}: checkout: moving from main to elevenlabs

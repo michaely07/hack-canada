@@ -1,0 +1,868 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading embedding model: all-MiniLM-L6-v2...
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 6921.52it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+Model loaded.
+Processing 5798 files...
+Ingesting:   0%|          | 0/5798 [00:00<?, ?it/s]Ingesting:   0%|          | 1/5798 [00:22<36:22:43, 22.59s/it]Ingesting:   0%|          | 2/5798 [00:23<15:57:09,  9.91s/it]Ingesting:   0%|          | 3/5798 [00:25<10:09:19,  6.31s/it]Ingesting:   0%|          | 4/5798 [00:42<16:43:03, 10.39s/it]Ingesting:   0%|          | 5/5798 [00:44<11:42:52,  7.28s/it]Ingesting:   0%|          | 6/5798 [00:45<8:22:41,  5.21s/it] Ingesting:   0%|          | 7/5798 [00:56<11:18:22,  7.03s/it]Ingesting:   0%|          | 8/5798 [00:56<7:53:46,  4.91s/it] Ingesting:   0%|          | 9/5798 [00:57<5:54:48,  3.68s/it]Ingesting:   0%|          | 10/5798 [01:04<7:51:14,  4.88s/it]Ingesting:   0%|          | 11/5798 [01:07<6:28:15,  4.03s/it]Ingesting:   0%|          | 12/5798 [01:08<5:16:23,  3.28s/it]Ingesting:   0%|          | 13/5798 [01:09<3:56:07,  2.45s/it]Ingesting:   0%|          | 14/5798 [01:20<8:23:57,  5.23s/it]Ingesting:   0%|          | 15/5798 [01:23<7:12:42,  4.49s/it]Ingesting:   0%|          | 16/5798 [01:25<5:48:51,  3.62s/it]Ingesting:   0%|          | 17/5798 [01:27<5:21:42,  3.34s/it]Ingesting:   0%|          | 18/5798 [01:28<4:09:05,  2.59s/it]Ingesting:   0%|          | 19/5798 [01:31<4:28:49,  2.79s/it]Ingesting:   0%|          | 20/5798 [01:39<6:53:11,  4.29s/it]Ingesting:   0%|          | 21/5798 [01:42<6:02:04,  3.76s/it]Ingesting:   0%|          | 22/5798 [01:48<7:02:45,  4.39s/it]Ingesting:   0%|          | 23/5798 [01:49<5:23:39,  3.36s/it]Ingesting:   0%|          | 24/5798 [01:50<4:26:36,  2.77s/it]Ingesting:   0%|          | 25/5798 [01:50<3:14:38,  2.02s/it]Ingesting:   0%|          | 26/5798 [01:54<3:54:56,  2.44s/it]Ingesting:   0%|          | 27/5798 [01:55<3:24:05,  2.12s/it]Ingesting:   0%|          | 28/5798 [01:56<2:52:05,  1.79s/it]Ingesting:   1%|          | 29/5798 [01:58<2:58:07,  1.85s/it]Ingesting:   1%|          | 30/5798 [02:10<7:43:13,  4.82s/it]Ingesting:   1%|          | 31/5798 [02:16<8:09:04,  5.09s/it]Ingesting:   1%|          | 32/5798 [02:17<6:26:27,  4.02s/it]Ingesting:   1%|          | 33/5798 [02:18<5:00:46,  3.13s/it]Ingesting:   1%|          | 34/5798 [02:19<3:50:53,  2.40s/it]Ingesting:   1%|          | 35/5798 [02:24<4:58:55,  3.11s/it]Ingesting:   1%|          | 36/5798 [02:25<3:56:45,  2.47s/it]Ingesting:   1%|          | 37/5798 [04:35<65:26:48, 40.90s/it]Ingesting:   1%|          | 38/5798 [04:36<46:05:06, 28.80s/it]Ingesting:   1%|          | 39/5798 [04:37<32:54:37, 20.57s/it]Ingesting:   1%|          | 40/5798 [04:41<25:07:48, 15.71s/it]Ingesting:   1%|          | 41/5798 [04:42<17:45:53, 11.11s/it]Ingesting:   1%|          | 42/5798 [04:43<13:12:24,  8.26s/it]Ingesting:   1%|          | 43/5798 [05:24<28:29:32, 17.82s/it]Ingesting:   1%|          | 44/5798 [05:42<28:54:00, 18.08s/it]Ingesting:   1%|          | 45/5798 [05:44<21:10:33, 13.25s/it]Ingesting:   1%|          | 46/5798 [05:47<15:59:04, 10.00s/it]Ingesting:   1%|          | 47/5798 [05:47<11:27:22,  7.17s/it]Ingesting:   1%|          | 48/5798 [05:48<8:28:57,  5.31s/it] Ingesting:   1%|          | 49/5798 [05:49<6:15:37,  3.92s/it]Ingesting:   1%|          | 50/5798 [05:54<6:44:55,  4.23s/it]Ingesting:   1%|          | 51/5798 [05:56<5:43:47,  3.59s/it]Ingesting:   1%|          | 52/5798 [05:59<5:33:43,  3.48s/it]Ingesting:   1%|          | 53/5798 [06:02<5:10:07,  3.24s/it]Ingesting:   1%|          | 54/5798 [06:03<4:01:51,  2.53s/it]Ingesting:   1%|          | 55/5798 [06:03<2:57:04,  1.85s/it]Ingesting:   1%|          | 56/5798 [06:05<3:15:58,  2.05s/it]Ingesting:   1%|          | 57/5798 [06:08<3:27:08,  2.16s/it]Ingesting:   1%|1         | 58/5798 [06:20<8:07:54,  5.10s/it]Ingesting:   1%|1         | 59/5798 [06:39<14:45:46,  9.26s/it]Ingesting:   1%|1         | 60/5798 [06:41<11:32:35,  7.24s/it]Ingesting:   1%|1         | 61/5798 [06:46<10:28:26,  6.57s/it]Ingesting:   1%|1         | 62/5798 [06:53<10:35:13,  6.64s/it]Ingesting:   1%|1         | 63/5798 [06:55<8:07:53,  5.10s/it] Ingesting:   1%|1         | 64/5798 [06:57<6:57:46,  4.37s/it]Ingesting:   1%|1         | 65/5798 [06:59<5:42:14,  3.58s/it]Ingesting:   1%|1         | 66/5798 [07:11<9:42:06,  6.09s/it]Ingesting:   1%|1         | 67/5798 [07:16<9:07:05,  5.73s/it]Ingesting:   1%|1         | 68/5798 [07:22<9:16:25,  5.83s/it]Ingesting:   1%|1         | 69/5798 [07:35<12:43:58,  8.00s/it]Ingesting:   1%|1         | 70/5798 [07:57<19:22:05, 12.17s/it]Ingesting:   1%|1         | 71/5798 [08:11<20:17:30, 12.76s/it]Ingesting:   1%|1         | 72/5798 [08:28<22:08:00, 13.92s/it]Ingesting:   1%|1         | 73/5798 [09:10<35:44:46, 22.48s/it]Ingesting:   1%|1         | 74/5798 [09:51<44:25:34, 27.94s/it]Ingesting:   1%|1         | 75/5798 [10:14<42:12:27, 26.55s/it]Ingesting:   1%|1         | 76/5798 [10:52<47:23:54, 29.82s/it]Ingesting:   1%|1         | 77/5798 [11:28<50:46:44, 31.95s/it]Ingesting:   1%|1         | 78/5798 [12:04<52:15:41, 32.89s/it]Ingesting:   1%|1         | 79/5798 [12:45<56:05:14, 35.31s/it]Ingesting:   1%|1         | 80/5798 [13:22<57:17:32, 36.07s/it]Ingesting:   1%|1         | 81/5798 [13:24<40:51:37, 25.73s/it]Ingesting:   1%|1         | 82/5798 [13:25<28:55:21, 18.22s/it]Ingesting:   1%|1         | 83/5798 [13:28<21:39:36, 13.64s/it]Ingesting:   1%|1         | 84/5798 [13:32<17:16:48, 10.89s/it]Ingesting:   1%|1         | 85/5798 [13:34<13:14:15,  8.34s/it]Ingesting:   1%|1         | 86/5798 [13:35<9:38:15,  6.07s/it] Ingesting:   2%|1         | 88/5798 [13:36<5:30:01,  3.47s/it]Ingesting:   2%|1         | 89/5798 [13:37<4:25:39,  2.79s/it]Ingesting:   2%|1         | 90/5798 [13:38<3:34:57,  2.26s/it]Ingesting:   2%|1         | 91/5798 [13:38<2:55:58,  1.85s/it]Ingesting:   2%|1         | 92/5798 [13:39<2:19:10,  1.46s/it]Ingesting:   2%|1         | 93/5798 [13:53<7:57:44,  5.02s/it]Ingesting:   2%|1         | 94/5798 [13:54<5:59:29,  3.78s/it]Ingesting:   2%|1         | 95/5798 [13:56<5:16:51,  3.33s/it]Ingesting:   2%|1         | 96/5798 [14:01<5:58:56,  3.78s/it]Ingesting:   2%|1         | 97/5798 [14:01<4:33:43,  2.88s/it]Ingesting:   2%|1         | 98/5798 [14:09<6:52:13,  4.34s/it]Ingesting:   2%|1         | 99/5798 [14:50<24:09:48, 15.26s/it]Ingesting:   2%|1         | 100/5798 [15:14<28:24:06, 17.94s/it]Ingesting:   2%|1         | 101/5798 [15:18<21:40:48, 13.70s/it]Ingesting:   2%|1         | 102/5798 [15:19<15:47:15,  9.98s/it]Ingesting:   2%|1         | 103/5798 [15:24<13:19:20,  8.42s/it]Ingesting:   2%|1         | 104/5798 [15:35<14:38:07,  9.25s/it]Ingesting:   2%|1         | 105/5798 [15:38<11:24:40,  7.22s/it]Ingesting:   2%|1         | 106/5798 [15:39<8:20:20,  5.27s/it] Ingesting:   2%|1         | 107/5798 [16:10<20:54:49, 13.23s/it]Ingesting:   2%|1         | 108/5798 [16:13<15:48:59, 10.01s/it]Ingesting:   2%|1         | 109/5798 [16:14<11:23:39,  7.21s/it]Ingesting:   2%|1         | 110/5798 [16:53<26:33:26, 16.81s/it]Ingesting:   2%|1         | 111/5798 [16:54<19:00:07, 12.03s/it]Ingesting:   2%|1         | 112/5798 [16:54<13:38:56,  8.64s/it]Ingesting:   2%|1         | 114/5798 [16:59<8:52:07,  5.62s/it] Ingesting:   2%|1         | 115/5798 [16:59<6:57:31,  4.41s/it]Ingesting:   2%|2         | 116/5798 [17:04<7:13:58,  4.58s/it]Ingesting:   2%|2         | 117/5798 [17:05<5:35:03,  3.54s/it]Ingesting:   2%|2         | 118/5798 [17:07<4:48:24,  3.05s/it]Ingesting:   2%|2         | 119/5798 [17:27<12:19:06,  7.81s/it]Ingesting:   2%|2         | 120/5798 [17:27<9:00:28,  5.71s/it] Ingesting:   2%|2         | 121/5798 [17:34<9:29:56,  6.02s/it]Ingesting:   2%|2         | 122/5798 [17:36<7:34:06,  4.80s/it]Ingesting:   2%|2         | 123/5798 [17:39<6:45:53,  4.29s/it]Ingesting:   2%|2         | 124/5798 [17:42<6:10:06,  3.91s/it]Ingesting:   2%|2         | 125/5798 [17:46<6:15:07,  3.97s/it]Ingesting:   2%|2         | 126/5798 [17:47<5:04:20,  3.22s/it]Ingesting:   2%|2         | 127/5798 [17:50<4:45:28,  3.02s/it]Ingesting:   2%|2         | 128/5798 [17:53<4:56:54,  3.14s/it]Ingesting:   2%|2         | 129/5798 [17:54<3:47:22,  2.41s/it]Ingesting:   2%|2         | 130/5798 [17:58<4:18:48,  2.74s/it]Ingesting:   2%|2         | 131/5798 [17:58<3:14:58,  2.06s/it]Ingesting:   2%|2         | 132/5798 [18:01<3:37:07,  2.30s/it]Ingesting:   2%|2         | 133/5798 [18:03<3:21:58,  2.14s/it]Ingesting:   2%|2         | 134/5798 [18:44<21:45:48, 13.83s/it]Ingesting:   2%|2         | 135/5798 [18:55<20:20:01, 12.93s/it]Ingesting:   2%|2         | 137/5798 [19:34<25:20:40, 16.12s/it]Ingesting:   2%|2         | 138/5798 [19:37<20:01:42, 12.74s/it]Ingesting:   2%|2         | 139/5798 [19:41<16:41:00, 10.61s/it]Ingesting:   2%|2         | 140/5798 [20:00<19:51:19, 12.63s/it]Ingesting:   2%|2         | 141/5798 [20:02<15:29:22,  9.86s/it]Ingesting:   2%|2         | 142/5798 [20:04<11:54:44,  7.58s/it]Ingesting:   2%|2         | 143/5798 [20:05<8:45:48,  5.58s/it] Ingesting:   2%|2         | 144/5798 [20:07<7:16:22,  4.63s/it]Ingesting:   3%|2         | 145/5798 [20:10<6:20:32,  4.04s/it]Ingesting:   3%|2         | 146/5798 [20:13<5:58:40,  3.81s/it]Ingesting:   3%|2         | 147/5798 [20:25<9:44:44,  6.21s/it]Ingesting:   3%|2         | 148/5798 [20:29<8:53:33,  5.67s/it]Ingesting:   3%|2         | 149/5798 [20:42<12:10:36,  7.76s/it]Ingesting:   3%|2         | 150/5798 [20:42<8:42:03,  5.55s/it] Ingesting:   3%|2         | 151/5798 [20:43<6:36:11,  4.21s/it]Ingesting:   3%|2         | 152/5798 [20:45<5:16:10,  3.36s/it]Ingesting:   3%|2         | 153/5798 [20:48<5:25:11,  3.46s/it]Ingesting:   3%|2         | 154/5798 [20:51<4:51:29,  3.10s/it]Ingesting:   3%|2         | 155/5798 [20:54<4:45:32,  3.04s/it]Ingesting:   3%|2         | 156/5798 [20:55<3:49:02,  2.44s/it]Ingesting:   3%|2         | 157/5798 [20:57<3:42:13,  2.36s/it]Ingesting:   3%|2         | 158/5798 [21:00<3:58:49,  2.54s/it]Ingesting:   3%|2         | 159/5798 [21:06<5:52:55,  3.76s/it]Ingesting:   3%|2         | 160/5798 [21:08<4:40:33,  2.99s/it]Ingesting:   3%|2         | 161/5798 [21:09<4:03:38,  2.59s/it]Ingesting:   3%|2         | 162/5798 [21:11<3:44:33,  2.39s/it]Ingesting:   3%|2         | 163/5798 [21:14<3:59:42,  2.55s/it]Ingesting:   3%|2         | 164/5798 [21:16<3:51:36,  2.47s/it]Ingesting:   3%|2         | 165/5798 [21:22<5:18:24,  3.39s/it]Ingesting:   3%|2         | 166/5798 [21:27<5:53:12,  3.76s/it]Ingesting:   3%|2         | 167/5798 [21:30<5:34:29,  3.56s/it]Ingesting:   3%|2         | 168/5798 [21:40<8:46:44,  5.61s/it]Ingesting:   3%|2         | 169/5798 [21:44<8:13:53,  5.26s/it]Ingesting:   3%|2         | 170/5798 [22:10<17:48:34, 11.39s/it]Ingesting:   3%|2         | 171/5798 [22:21<17:28:51, 11.18s/it]Ingesting:   3%|2         | 172/5798 [22:22<12:40:51,  8.11s/it]Ingesting:   3%|2         | 173/5798 [22:25<10:08:50,  6.49s/it]Ingesting:   3%|3         | 174/5798 [22:25<7:31:10,  4.81s/it] Ingesting:   3%|3         | 175/5798 [22:26<5:26:44,  3.49s/it]Ingesting:   3%|3         | 176/5798 [22:26<4:01:08,  2.57s/it]Ingesting:   3%|3         | 177/5798 [22:27<3:12:31,  2.06s/it]Ingesting:   3%|3         | 178/5798 [22:29<2:58:47,  1.91s/it]Ingesting:   3%|3         | 179/5798 [22:32<3:24:41,  2.19s/it]Ingesting:   3%|3         | 180/5798 [22:32<2:33:31,  1.64s/it]Ingesting:   3%|3         | 181/5798 [22:34<2:36:34,  1.67s/it]Ingesting:   3%|3         | 182/5798 [22:35<2:15:46,  1.45s/it]Ingesting:   3%|3         | 183/5798 [22:36<2:16:47,  1.46s/it]Ingesting:   3%|3         | 184/5798 [22:37<2:13:49,  1.43s/it]Ingesting:   3%|3         | 185/5798 [22:48<6:38:23,  4.26s/it]Ingesting:   3%|3         | 186/5798 [22:55<8:01:02,  5.14s/it]Ingesting:   3%|3         | 187/5798 [22:57<6:20:40,  4.07s/it]Ingesting:   3%|3         | 188/5798 [22:59<5:18:27,  3.41s/it]Ingesting:   3%|3         | 189/5798 [23:01<4:35:01,  2.94s/it]Ingesting:   3%|3         | 190/5798 [23:03<4:07:08,  2.64s/it]Ingesting:   3%|3         | 191/5798 [23:06<4:21:23,  2.80s/it]Ingesting:   3%|3         | 192/5798 [23:10<4:49:44,  3.10s/it]Ingesting:   3%|3         | 193/5798 [23:11<4:09:34,  2.67s/it]Ingesting:   3%|3         | 194/5798 [23:13<3:46:54,  2.43s/it]Ingesting:   3%|3         | 195/5798 [23:16<3:56:21,  2.53s/it]Ingesting:   3%|3         | 196/5798 [23:32<10:14:46,  6.58s/it]Ingesting:   3%|3         | 197/5798 [23:33<7:28:00,  4.80s/it] Ingesting:   3%|3         | 198/5798 [23:34<5:51:55,  3.77s/it]Ingesting:   3%|3         | 199/5798 [23:35<4:44:31,  3.05s/it]Ingesting:   3%|3         | 200/5798 [23:38<4:20:02,  2.79s/it]Ingesting:   3%|3         | 201/5798 [23:40<4:07:47,  2.66s/it]Ingesting:   4%|3         | 203/5798 [23:40<2:24:14,  1.55s/it]Ingesting:   4%|3         | 204/5798 [23:46<4:06:52,  2.65s/it]Ingesting:   4%|3         | 205/5798 [23:49<4:10:30,  2.69s/it]Ingesting:   4%|3         | 206/5798 [23:58<6:54:51,  4.45s/it]Ingesting:   4%|3         | 207/5798 [24:08<9:00:20,  5.80s/it]Ingesting:   4%|3         | 208/5798 [24:13<8:51:15,  5.70s/it]Ingesting:   4%|3         | 209/5798 [24:15<6:56:27,  4.47s/it]Ingesting:   4%|3         | 210/5798 [24:35<14:24:31,  9.28s/it]Ingesting:   4%|3         | 211/5798 [24:42<12:55:54,  8.33s/it]Ingesting:   4%|3         | 212/5798 [24:45<10:37:55,  6.85s/it]Ingesting:   4%|3         | 213/5798 [24:50<10:04:20,  6.49s/it]Ingesting:   4%|3         | 214/5798 [24:54<8:32:22,  5.51s/it] Ingesting:   4%|3         | 215/5798 [24:54<6:12:13,  4.00s/it]Ingesting:   4%|3         | 216/5798 [25:01<7:33:59,  4.88s/it]Ingesting:   4%|3         | 217/5798 [25:01<5:26:04,  3.51s/it]Ingesting:   4%|3         | 218/5798 [25:02<4:11:58,  2.71s/it]Ingesting:   4%|3         | 219/5798 [25:04<3:58:40,  2.57s/it]Ingesting:   4%|3         | 220/5798 [25:14<7:07:43,  4.60s/it]Ingesting:   4%|3         | 221/5798 [25:19<7:14:13,  4.67s/it]Ingesting:   4%|3         | 222/5798 [25:26<8:38:42,  5.58s/it]Ingesting:   4%|3         | 223/5798 [25:36<10:22:33,  6.70s/it]Ingesting:   4%|3         | 224/5798 [25:38<8:25:29,  5.44s/it] Ingesting:   4%|3         | 225/5798 [25:42<7:33:52,  4.89s/it]Ingesting:   4%|3         | 226/5798 [25:56<11:57:46,  7.73s/it]Ingesting:   4%|3         | 227/5798 [26:54<35:17:26, 22.80s/it]Ingesting:   4%|3         | 228/5798 [27:00<27:24:55, 17.72s/it]Ingesting:   4%|3         | 229/5798 [27:24<30:21:13, 19.62s/it]Ingesting:   4%|3         | 230/5798 [27:26<22:14:08, 14.38s/it]Ingesting:   4%|3         | 231/5798 [27:56<29:35:12, 19.13s/it]Ingesting:   4%|4         | 232/5798 [28:27<34:51:38, 22.55s/it]Ingesting:   4%|4         | 233/5798 [28:28<24:59:23, 16.17s/it]Ingesting:   4%|4         | 234/5798 [28:35<20:48:17, 13.46s/it]Ingesting:   4%|4         | 235/5798 [28:36<14:45:17,  9.55s/it]Ingesting:   4%|4         | 236/5798 [29:01<21:49:48, 14.13s/it]Ingesting:   4%|4         | 237/5798 [29:03<16:31:21, 10.70s/it]Ingesting:   4%|4         | 238/5798 [29:07<13:10:28,  8.53s/it]Ingesting:   4%|4         | 239/5798 [31:43<81:39:08, 52.88s/it]Ingesting:   4%|4         | 240/5798 [31:46<58:33:35, 37.93s/it]Ingesting:   4%|4         | 241/5798 [31:49<42:20:34, 27.43s/it]Ingesting:   4%|4         | 242/5798 [31:51<30:40:16, 19.87s/it]Ingesting:   4%|4         | 243/5798 [31:53<22:06:59, 14.33s/it]Ingesting:   4%|4         | 244/5798 [31:53<15:49:20, 10.26s/it]Ingesting:   4%|4         | 245/5798 [31:57<12:51:38,  8.34s/it]Ingesting:   4%|4         | 246/5798 [31:58<9:25:18,  6.11s/it] Ingesting:   4%|4         | 247/5798 [31:59<6:56:40,  4.50s/it]Ingesting:   4%|4         | 248/5798 [32:00<5:16:07,  3.42s/it]Ingesting:   4%|4         | 249/5798 [32:01<4:01:55,  2.62s/it]Ingesting:   4%|4         | 250/5798 [32:12<7:56:53,  5.16s/it]Ingesting:   4%|4         | 251/5798 [32:18<8:20:44,  5.42s/it]Ingesting:   4%|4         | 252/5798 [32:24<8:43:13,  5.66s/it]Ingesting:   4%|4         | 253/5798 [32:55<20:30:29, 13.31s/it]Ingesting:   4%|4         | 254/5798 [32:58<15:42:22, 10.20s/it]Ingesting:   4%|4         | 255/5798 [32:59<11:32:21,  7.49s/it]Ingesting:   4%|4         | 256/5798 [33:21<18:17:07, 11.88s/it]Ingesting:   4%|4         | 257/5798 [33:22<13:08:26,  8.54s/it]Ingesting:   4%|4         | 258/5798 [33:27<11:34:35,  7.52s/it]Ingesting:   4%|4         | 259/5798 [33:28<8:29:48,  5.52s/it] Ingesting:   4%|4         | 260/5798 [33:32<7:35:09,  4.93s/it]Ingesting:   5%|4         | 261/5798 [33:35<6:59:40,  4.55s/it]Ingesting:   5%|4         | 262/5798 [33:36<5:22:36,  3.50s/it]Ingesting:   5%|4         | 263/5798 [33:37<4:07:02,  2.68s/it]Ingesting:   5%|4         | 264/5798 [33:39<3:44:12,  2.43s/it]Ingesting:   5%|4         | 265/5798 [33:40<2:59:14,  1.94s/it]Ingesting:   5%|4         | 266/5798 [33:44<4:13:04,  2.74s/it]Ingesting:   5%|4         | 267/5798 [33:51<6:02:50,  3.94s/it]Ingesting:   5%|4         | 268/5798 [33:51<4:21:29,  2.84s/it]Ingesting:   5%|4         | 269/5798 [33:52<3:23:40,  2.21s/it]Ingesting:   5%|4         | 270/5798 [33:53<2:45:02,  1.79s/it]Ingesting:   5%|4         | 271/5798 [34:11<10:27:27,  6.81s/it]Ingesting:   5%|4         | 272/5798 [34:12<7:39:51,  4.99s/it] Ingesting:   5%|4         | 273/5798 [34:13<5:42:05,  3.72s/it]Ingesting:   5%|4         | 274/5798 [34:14<4:20:07,  2.83s/it]Ingesting:   5%|4         | 275/5798 [34:14<3:22:42,  2.20s/it]Ingesting:   5%|4         | 276/5798 [34:17<3:33:37,  2.32s/it]Ingesting:   5%|4         | 277/5798 [34:18<2:49:57,  1.85s/it]Ingesting:   5%|4         | 278/5798 [34:23<4:13:26,  2.75s/it]Ingesting:   5%|4         | 279/5798 [35:10<24:46:43, 16.16s/it]Ingesting:   5%|4         | 280/5798 [35:11<17:43:55, 11.57s/it]Ingesting:   5%|4         | 281/5798 [35:46<28:41:38, 18.72s/it]Ingesting:   5%|4         | 282/5798 [36:37<43:31:38, 28.41s/it]Ingesting:   5%|4         | 283/5798 [36:38<30:48:23, 20.11s/it]Ingesting:   5%|4         | 284/5798 [36:45<24:30:57, 16.01s/it]Ingesting:   5%|4         | 285/5798 [36:50<19:34:59, 12.79s/it]Ingesting:   5%|4         | 286/5798 [36:56<16:37:35, 10.86s/it]Ingesting:   5%|4         | 287/5798 [37:02<14:21:34,  9.38s/it]Ingesting:   5%|4         | 288/5798 [37:13<15:15:23,  9.97s/it]Ingesting:   5%|4         | 289/5798 [37:14<11:01:52,  7.21s/it]Ingesting:   5%|5         | 290/5798 [37:34<16:57:02, 11.08s/it]Ingesting:   5%|5         | 291/5798 [37:35<12:18:26,  8.05s/it]Ingesting:   5%|5         | 292/5798 [37:41<11:06:57,  7.27s/it]Ingesting:   5%|5         | 293/5798 [37:45<9:47:56,  6.41s/it] Ingesting:   5%|5         | 294/5798 [37:49<8:24:43,  5.50s/it]Ingesting:   5%|5         | 295/5798 [37:50<6:31:09,  4.26s/it]Ingesting:   5%|5         | 296/5798 [37:51<5:11:09,  3.39s/it]Ingesting:   5%|5         | 297/5798 [37:54<4:45:12,  3.11s/it]Ingesting:   5%|5         | 298/5798 [38:06<9:09:42,  6.00s/it]Ingesting:   5%|5         | 299/5798 [38:12<8:46:10,  5.74s/it]Ingesting:   5%|5         | 300/5798 [38:13<6:59:25,  4.58s/it]Ingesting:   5%|5         | 301/5798 [38:15<5:33:04,  3.64s/it]Ingesting:   5%|5         | 302/5798 [38:17<4:56:09,  3.23s/it]Ingesting:   5%|5         | 303/5798 [38:27<7:57:01,  5.21s/it]Ingesting:   5%|5         | 304/5798 [38:30<7:04:42,  4.64s/it]Ingesting:   5%|5         | 305/5798 [38:32<5:46:04,  3.78s/it]Ingesting:   5%|5         | 306/5798 [38:34<5:05:38,  3.34s/it]Ingesting:   5%|5         | 307/5798 [38:56<13:33:50,  8.89s/it]Ingesting:   5%|5         | 308/5798 [39:39<29:04:37, 19.07s/it]Ingesting:   5%|5         | 309/5798 [40:25<41:31:10, 27.23s/it]Ingesting:   5%|5         | 310/5798 [40:50<40:25:15, 26.52s/it]Ingesting:   5%|5         | 311/5798 [40:55<30:28:15, 19.99s/it]Ingesting:   5%|5         | 312/5798 [40:58<22:41:09, 14.89s/it]Ingesting:   5%|5         | 313/5798 [41:04<18:47:25, 12.33s/it]Ingesting:   5%|5         | 314/5798 [41:06<14:03:15,  9.23s/it]Ingesting:   5%|5         | 315/5798 [41:08<10:36:59,  6.97s/it]Ingesting:   5%|5         | 316/5798 [41:17<11:40:53,  7.67s/it]Ingesting:   5%|5         | 317/5798 [41:19<9:00:23,  5.92s/it] Ingesting:   5%|5         | 318/5798 [41:20<6:45:16,  4.44s/it]Ingesting:   6%|5         | 319/5798 [41:20<4:53:44,  3.22s/it]Ingesting:   6%|5         | 320/5798 [41:24<4:52:57,  3.21s/it]Ingesting:   6%|5         | 321/5798 [41:25<3:55:01,  2.57s/it]Ingesting:   6%|5         | 322/5798 [41:25<3:03:40,  2.01s/it]Ingesting:   6%|5         | 323/5798 [41:26<2:27:22,  1.62s/it]Ingesting:   6%|5         | 324/5798 [42:09<21:26:56, 14.11s/it]Ingesting:   6%|5         | 325/5798 [42:36<27:16:22, 17.94s/it]Ingesting:   6%|5         | 326/5798 [42:43<22:14:57, 14.64s/it]Ingesting:   6%|5         | 327/5798 [43:57<49:22:02, 32.48s/it]Ingesting:   6%|5         | 328/5798 [43:59<35:06:07, 23.10s/it]Ingesting:   6%|5         | 329/5798 [44:03<26:28:10, 17.42s/it]Ingesting:   6%|5         | 330/5798 [44:08<20:45:05, 13.66s/it]Ingesting:   6%|5         | 331/5798 [44:09<14:56:17,  9.84s/it]Ingesting:   6%|5         | 332/5798 [44:15<13:22:00,  8.80s/it]Ingesting:   6%|5         | 333/5798 [45:59<56:34:31, 37.27s/it]Ingesting:   6%|5         | 334/5798 [46:02<41:06:20, 27.08s/it]Ingesting:   6%|5         | 335/5798 [46:05<30:09:48, 19.88s/it]Ingesting:   6%|5         | 336/5798 [46:10<23:19:01, 15.37s/it]Ingesting:   6%|5         | 337/5798 [46:13<17:46:01, 11.71s/it]Ingesting:   6%|5         | 338/5798 [46:15<13:07:27,  8.65s/it]Ingesting:   6%|5         | 339/5798 [46:24<13:32:39,  8.93s/it]Ingesting:   6%|5         | 340/5798 [46:25<9:47:07,  6.45s/it] Ingesting:   6%|5         | 341/5798 [46:28<8:27:29,  5.58s/it]Ingesting:   6%|5         | 342/5798 [46:35<8:50:48,  5.84s/it]Ingesting:   6%|5         | 343/5798 [46:36<6:57:21,  4.59s/it]Ingesting:   6%|5         | 344/5798 [46:38<5:23:15,  3.56s/it]Ingesting:   6%|5         | 345/5798 [46:45<6:55:05,  4.57s/it]Ingesting:   6%|5         | 346/5798 [46:52<8:01:26,  5.30s/it]Ingesting:   6%|5         | 347/5798 [47:23<19:47:39, 13.07s/it]Ingesting:   6%|6         | 348/5798 [47:25<14:58:20,  9.89s/it]Ingesting:   6%|6         | 349/5798 [47:27<11:04:39,  7.32s/it]Ingesting:   6%|6         | 350/5798 [47:31<9:41:58,  6.41s/it] Ingesting:   6%|6         | 351/5798 [47:40<11:02:41,  7.30s/it]Ingesting:   6%|6         | 352/5798 [47:43<9:10:35,  6.07s/it] Ingesting:   6%|6         | 353/5798 [47:45<7:18:37,  4.83s/it]Ingesting:   6%|6         | 354/5798 [47:52<8:02:00,  5.31s/it]Ingesting:   6%|6         | 355/5798 [48:07<12:34:22,  8.32s/it]Ingesting:   6%|6         | 356/5798 [48:13<11:22:29,  7.52s/it]Ingesting:   6%|6         | 357/5798 [48:22<12:14:07,  8.10s/it]Ingesting:   6%|6         | 358/5798 [48:25<9:52:40,  6.54s/it] Ingesting:   6%|6         | 359/5798 [48:28<8:20:37,  5.52s/it]Ingesting:   6%|6         | 360/5798 [48:34<8:31:56,  5.65s/it]Ingesting:   6%|6         | 361/5798 [48:36<6:38:22,  4.40s/it]Ingesting:   6%|6         | 362/5798 [48:37<5:12:58,  3.45s/it]Ingesting:   6%|6         | 363/5798 [48:39<4:35:20,  3.04s/it]Ingesting:   6%|6         | 364/5798 [48:56<10:55:46,  7.24s/it]Ingesting:   6%|6         | 365/5798 [48:58<8:25:16,  5.58s/it] Ingesting:   6%|6         | 366/5798 [49:03<8:14:29,  5.46s/it]Ingesting:   6%|6         | 367/5798 [49:04<6:28:34,  4.29s/it]Ingesting:   6%|6         | 368/5798 [49:24<13:20:01,  8.84s/it]Ingesting:   6%|6         | 369/5798 [49:27<10:49:50,  7.18s/it]Ingesting:   6%|6         | 370/5798 [49:31<9:24:12,  6.24s/it] Ingesting:   6%|6         | 371/5798 [49:35<8:21:08,  5.54s/it]Ingesting:   6%|6         | 373/5798 [49:42<6:52:57,  4.57s/it]Ingesting:   6%|6         | 374/5798 [50:06<14:11:57,  9.42s/it]Ingesting:   6%|6         | 376/5798 [50:10<9:27:03,  6.28s/it] Ingesting:   7%|6         | 377/5798 [50:30<14:15:10,  9.47s/it]Ingesting:   7%|6         | 378/5798 [50:31<11:03:42,  7.35s/it]Ingesting:   7%|6         | 379/5798 [50:32<8:31:31,  5.66s/it] Ingesting:   7%|6         | 380/5798 [50:34<7:06:29,  4.72s/it]Ingesting:   7%|6         | 381/5798 [50:38<6:48:49,  4.53s/it]Ingesting:   7%|6         | 382/5798 [50:41<6:09:23,  4.09s/it]Ingesting:   7%|6         | 383/5798 [50:42<4:56:46,  3.29s/it]Ingesting:   7%|6         | 384/5798 [50:44<4:15:56,  2.84s/it]Ingesting:   7%|6         | 385/5798 [50:50<5:25:59,  3.61s/it]Ingesting:   7%|6         | 386/5798 [50:51<4:20:45,  2.89s/it]Ingesting:   7%|6         | 387/5798 [50:51<3:18:56,  2.21s/it]Ingesting:   7%|6         | 388/5798 [50:52<2:29:26,  1.66s/it]Ingesting:   7%|6         | 389/5798 [50:54<2:45:41,  1.84s/it]Ingesting:   7%|6         | 390/5798 [51:05<7:00:53,  4.67s/it]Ingesting:   7%|6         | 391/5798 [51:08<5:56:19,  3.95s/it]Ingesting:   7%|6         | 392/5798 [51:12<5:56:18,  3.95s/it]Ingesting:   7%|6         | 393/5798 [51:14<5:08:34,  3.43s/it]Ingesting:   7%|6         | 394/5798 [51:18<5:25:23,  3.61s/it]Ingesting:   7%|6         | 395/5798 [51:19<4:33:37,  3.04s/it]Ingesting:   7%|6         | 396/5798 [51:23<4:39:35,  3.11s/it]Ingesting:   7%|6         | 397/5798 [51:24<3:59:32,  2.66s/it]Ingesting:   7%|6         | 398/5798 [51:25<3:07:57,  2.09s/it]Ingesting:   7%|6         | 399/5798 [51:26<2:26:38,  1.63s/it]Ingesting:   7%|6         | 400/5798 [51:27<2:11:06,  1.46s/it]Ingesting:   7%|6         | 401/5798 [51:32<3:40:51,  2.46s/it]Ingesting:   7%|6         | 402/5798 [51:33<3:03:08,  2.04s/it]Ingesting:   7%|6         | 403/5798 [51:34<2:53:38,  1.93s/it]Ingesting:   7%|6         | 404/5798 [51:35<2:18:12,  1.54s/it]Ingesting:   7%|6         | 405/5798 [51:36<2:20:26,  1.56s/it]Ingesting:   7%|7         | 406/5798 [51:39<2:44:03,  1.83s/it]Ingesting:   7%|7         | 407/5798 [51:39<2:07:58,  1.42s/it]Ingesting:   7%|7         | 408/5798 [51:40<1:40:29,  1.12s/it]Ingesting:   7%|7         | 409/5798 [51:45<3:33:36,  2.38s/it]WARN C-0.4.xml: no sections found, skipping
+WARN C-10.54.xml: no sections found, skipping
+WARN C-15.21.xml: no sections found, skipping
+WARN C-31.7.xml: no sections found, skipping
+WARN F-11.8.xml: no sections found, skipping
+WARN F-12.xml: no sections found, skipping
+  WARN section 237545: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237553: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237562: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237569: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237572: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237580: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237585: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237591: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237593: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237595: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237597: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237600: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237618: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237620: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237622: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237637: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237649: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237661: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237666: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237704: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237719: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237723: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237731: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237741: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237772: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237788: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237792: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237797: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237801: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237809: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237813: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237818: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237824: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237833: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237858: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 237869: could not extend file "base/16384/16767": No space left on device
+HINT:  Check free disk space.
+  WARN section 237873: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237881: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237887: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237915: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237923: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237927: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237939: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237944: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237948: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237955: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237960: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237965: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237969: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237974: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237978: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237987: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 237995: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238000: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238018: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238024: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238033: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238052: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238056: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238083: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238090: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238094: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238105: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238123: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238128: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238130: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238147: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238156: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238158: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238159: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238161: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238163: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238165: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238166: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238167: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238168: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238169: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238170: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238171: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238172: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238173: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238175: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238177: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238179: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238180: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238181: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238182: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238183: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238184: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238186: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238187: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238188: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238190: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238191: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238192: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238193: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238195: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238197: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238199: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238200: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238201: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238202: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238205: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238206: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238207: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238208: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238209: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238210: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238211: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238212: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238213: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238214: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238215: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238216: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238217: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238218: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238219: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238220: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238221: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238222: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238223: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238224: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238225: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238227: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238228: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238229: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238232: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238233: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238236: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238237: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238238: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238239: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238240: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238241: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238242: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238243: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238244: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238245: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238246: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238247: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238248: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238249: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238250: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238251: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238252: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238254: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238256: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238257: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238258: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238259: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238260: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238261: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238262: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238263: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238264: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238267: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238268: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238269: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238271: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238272: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238273: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238274: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238276: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238278: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238279: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238281: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238284: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238285: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238286: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238287: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238288: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238289: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238290: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238292: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238294: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238311: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238313: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238315: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238318: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238319: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238320: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238321: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238322: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238324: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238328: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238330: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238332: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238336: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238338: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238339: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238340: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238341: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238342: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238343: could not extend file "base/16384/16764": No space left on device
+HINT:  Check free disk space.
+  WARN section 238344: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238347: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238349: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238350: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238351: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238352: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238353: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238354: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238355: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238357: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238359: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238360: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238362: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238365: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238366: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238367: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238368: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238369: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238370: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238371: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238372: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238373: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238374: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238375: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238376: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238377: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238378: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238379: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238380: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238381: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238382: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238383: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238384: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238385: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238386: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238387: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238388: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238389: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238390: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238391: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238392: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238393: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238394: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238395: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238396: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238397: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238400: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238403: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238404: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238405: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238406: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238407: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238409: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238411: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238413: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238414: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238416: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238417: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238418: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238419: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238420: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238421: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238422: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238423: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238424: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238425: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238426: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238427: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238428: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238431: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238432: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238433: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+Ingesting:   7%|7         | 410/5798 [52:18<17:04:22, 11.41s/it]Ingesting:   7%|7         | 411/5798 [52:19<12:34:34,  8.40s/it]  WARN section 238434: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238435: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238436: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238437: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238438: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238439: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238440: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238441: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238442: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238443: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238444: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238445: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238446: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238447: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238448: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238449: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238450: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238451: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238452: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238453: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238454: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238455: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238456: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238457: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238458: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238459: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238460: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238461: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238462: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238464: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238466: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238468: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238475: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238477: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238479: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238480: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238481: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238483: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238484: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238485: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238487: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238489: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238492: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238493: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238494: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238496: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238498: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238499: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238501: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238502: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238504: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238506: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238509: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238510: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238511: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238512: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238513: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238514: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238516: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238518: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238520: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238521: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238524: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238525: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238526: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238527: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238528: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+Ingesting:   7%|7         | 412/5798 [52:20<9:03:49,  6.06s/it] Ingesting:   7%|7         | 413/5798 [52:20<6:36:45,  4.42s/it]Ingesting:   7%|7         | 413/5798 [52:20<11:22:33,  7.61s/it]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\zkyu2\hack-canada\etl\__main__.py", line 21, in <module>
+    main()
+  File "C:\Users\zkyu2\hack-canada\etl\__main__.py", line 17, in main
+    asyncio.run(run_ingestion(args))
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\hack-canada\etl\ingest.py", line 70, in run_ingestion
+    law_id = await conn.fetchval("""
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\site-packages\asyncpg\connection.py", line 718, in fetchval
+    data = await self._execute(query, args, 1, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\site-packages\asyncpg\connection.py", line 1873, in _execute
+    result, _ = await self.__execute(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\site-packages\asyncpg\connection.py", line 1970, in __execute
+    result, stmt = await self._do_execute(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\zkyu2\.pyenv\pyenv-win\versions\3.11.9\Lib\site-packages\asyncpg\connection.py", line 2033, in _do_execute
+    result = await executor(stmt, None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "asyncpg/protocol/protocol.pyx", line 205, in bind_execute
+    return await waiter
+asyncpg.exceptions.DiskFullError: could not extend file "base/16384/16718": No space left on device
+HINT:  Check free disk space.
+  WARN section 238529: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238530: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238531: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238532: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238533: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238534: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238535: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238536: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238537: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238539: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238540: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238541: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238542: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238543: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238545: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238546: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238547: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238549: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238551: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238552: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238553: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238555: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238556: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238557: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238558: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238559: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238560: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238561: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238563: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238564: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238565: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238566: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238567: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238569: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238570: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238571: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238573: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238575: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238577: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238584: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238585: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238586: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238587: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238588: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238590: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238591: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238594: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238595: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238596: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238597: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238598: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238600: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238602: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238631: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238633: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238635: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238636: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238638: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238640: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238641: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238642: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238644: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238645: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238646: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238648: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238649: could not extend file "base/16384/16760": No space left on device
+HINT:  Check free disk space.
+  WARN section 238676: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238679: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238690: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 238693: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 1393559: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 1393562: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 1393584: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.
+  WARN section 1393589: could not extend file "base/16384/16763": No space left on device
+HINT:  Check free disk space.

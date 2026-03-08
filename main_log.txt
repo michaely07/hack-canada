@@ -1,0 +1,60 @@
+commit 8983f05571ca12dd1176038c032d6b599fe4b427
+Merge: 3410c00 ff87565
+Author: Michael Yu <81588582+michaely07@users.noreply.github.com>
+Date:   Sat Mar 7 21:42:38 2026 -0500
+
+    Merge pull request #5 from michaely07/elevenlabs
+    
+    Implement Live RAG Graph and Laymans Translator Analysis Tab
+
+commit ff8756539d319a1834559408370e3a19d860c3c3
+Author: Michael Yu <zk.yu26@gmail.com>
+Date:   Sat Mar 7 21:41:17 2026 -0500
+
+    Implement Live RAG Graph and Laymans Translator Analysis Tab
+
+ diff.patch | 1313 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1313 insertions(+)
+
+commit 3410c001e735c679f649bfc38b721627ccabb9f3
+Merge: e51691f 986c768
+Author: Michael Yu <81588582+michaely07@users.noreply.github.com>
+Date:   Sat Mar 7 21:31:53 2026 -0500
+
+    Merge pull request #4 from michaely07/elevenlabs
+    
+    main UI and intelligence improvements
+
+commit 986c768c6c13d4c4d03bd708d1f0778cdad2845c
+Merge: b897be9 e51691f
+Author: Michael Yu <81588582+michaely07@users.noreply.github.com>
+Date:   Sat Mar 7 21:31:38 2026 -0500
+
+    Merge branch 'main' into elevenlabs
+
+commit b897be9de207b9770a1a19a58f953177132849ae
+Author: Michael Yu <zk.yu26@gmail.com>
+Date:   Sat Mar 7 21:28:20 2026 -0500
+
+    UI and intelligence improvements.
+
+ api/config.py                                    |   1 +
+ api/models/schemas.py                            |   4 +
+ api/routers/query.py                             | 101 +++++++++++++--
+ api/routers/voice.py                             | 106 +++++----------
+ api/services/conversation.py                     |  45 +++++++
+ api/services/rag.py                              | 129 +++++++++++++-----
+ client/index.html                                |  27 ++--
+ client/src/components/auditor/AnalysisViewer.jsx |  64 +++++++++
+ client/src/components/auditor/AuditorPane.jsx    |  19 +++
+ client/src/components/auditor/LegalGraph.jsx     | 122 ++++++++++++++---
+ client/src/components/auditor/SectionViewer.jsx  |  16 ++-
+ client/src/components/chat/ChatPane.jsx          |  10 +-
+ client/src/components/chat/MessageBubble.jsx     |  22 ++++
+ client/src/components/chat/QueryInput.jsx        | 158 ++++++++++++++++++-----
+ client/src/components/layout/AppShell.jsx        |  79 ++++++++++--
+ client/src/components/layout/StatusBar.jsx       |  12 +-
+ client/src/index.css                             |  71 +++++++++-
+ client/src/stores/auditorStore.js                |  25 +++-
+ client/src/stores/chatStore.js                   |  20 ++-
+ 19 files changed, 816 insertions(+), 215 deletions(-)
