@@ -114,7 +114,7 @@ export default function AppShell() {
       </header>
 
       <div className="w-full h-[1px] relative z-20"
-        style={{ background: 'linear-gradient(to right, transparent, var(--navy-lighter), transparent)' }}
+        style={{ background: 'var(--navy-lighter)' }}
       />
 
       <div className="flex flex-1 overflow-hidden relative z-10">
