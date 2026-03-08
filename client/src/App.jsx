@@ -1,4 +1,5 @@
 import React, { Component, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import AppShell from './components/layout/AppShell'
 import LandingPage from './components/layout/LandingPage'
 import { useChatStore } from './stores/chatStore'
@@ -35,21 +36,34 @@ export default function App() {
   const handleEnter = (query) => {
     setShowLanding(false)
     if (query) {
-      setTimeout(() => sendQuery(query), 300)
+      setTimeout(() => sendQuery(query), 600)
     }
-  }
-
-  if (showLanding) {
-    return (
-      <ErrorBoundary>
-        <LandingPage onEnter={handleEnter} />
-      </ErrorBoundary>
-    )
   }
 
   return (
     <ErrorBoundary>
-      <AppShell />
+      <AnimatePresence mode="wait">
+        {showLanding ? (
+          <motion.div
+            key="landing"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+          >
+            <LandingPage onEnter={handleEnter} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="app"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="h-screen"
+          >
+            <AppShell />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </ErrorBoundary>
   )
 }
