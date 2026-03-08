@@ -10,6 +10,7 @@ export default function AppShell({ onBack }) {
   const { isAudioPlaying, stopAudio, setSelectedVoiceId, setSelectedPresetId } = useChatStore()
   const [presets, setPresets] = useState([])
   const [activePreset, setActivePreset] = useState('')
+  const [panelOpen, setPanelOpen] = useState(true)
 
   const personaTints = {
     assertive: 'radial-gradient(ellipse at top right, rgba(194,59,34,0.06), transparent 50%)',
@@ -118,20 +119,46 @@ export default function AppShell({ onBack }) {
       />
 
       <div className="flex flex-1 overflow-hidden relative z-10">
-        <div className="w-[60%] flex flex-col relative">
+        <div className="flex flex-col relative transition-all duration-300 ease-in-out" style={{ width: panelOpen ? '60%' : '100%' }}>
           <ChatPane />
-          <div className="absolute right-0 top-0 bottom-0 w-[1px]"
-            style={{ background: 'linear-gradient(to bottom, transparent, var(--navy-lighter), transparent)' }}
-          />
+          {panelOpen && (
+            <div className="absolute right-0 top-0 bottom-0 w-[1px]"
+              style={{ background: 'var(--navy-lighter)' }}
+            />
+          )}
         </div>
 
-        <div className="w-[40%] flex flex-col" style={{ background: 'var(--navy-light)' }}>
+        {/* Toggle button */}
+        <button
+          onClick={() => setPanelOpen(!panelOpen)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-5 h-10 rounded-l-md transition-all duration-200 hover:opacity-100"
+          style={{
+            background: 'var(--navy-lighter)',
+            color: 'var(--text-secondary)',
+            opacity: 0.7,
+            right: panelOpen ? '40%' : '0',
+          }}
+          title={panelOpen ? 'Collapse panel' : 'Expand panel'}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            {panelOpen ? <polyline points="9 6 15 12 9 18" /> : <polyline points="15 6 9 12 15 18" />}
+          </svg>
+        </button>
+
+        <div
+          className="flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+          style={{
+            width: panelOpen ? '40%' : '0',
+            opacity: panelOpen ? 1 : 0,
+            background: 'var(--navy-light)',
+          }}
+        >
           <div className="flex border-b" style={{ borderColor: 'var(--navy-lighter)', background: 'var(--navy)' }}>
             {['source', 'analysis', 'graph'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === tab ? 'border-b-2' : ''}`}
+                className={`px-5 py-3 text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab ? 'border-b-2' : ''}`}
                 style={{
                   borderColor: activeTab === tab ? 'var(--gold)' : 'transparent',
                   color: activeTab === tab ? 'var(--gold)' : 'var(--text-secondary)',
