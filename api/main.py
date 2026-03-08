@@ -1,5 +1,5 @@
 """
-StatuteLens — FastAPI application entry point.
+SpecterBot — FastAPI application entry point.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     await close_pool()
 
 app = FastAPI(
-    title="StatuteLens API",
+    title="SpecterBot API",
     description="AI-Powered Legal Research Platform for Canadian Federal Law",
     version="0.1.0",
     lifespan=lifespan

@@ -13,22 +13,10 @@ export default function AppShell({ onBack }) {
   const [panelOpen, setPanelOpen] = useState(true)
 
   const personaTints = {
-    assertive: 'radial-gradient(ellipse at top right, rgba(194,59,34,0.06), transparent 50%)',
-    analytical: 'radial-gradient(ellipse at top right, rgba(74,157,91,0.06), transparent 50%)',
+    assertive: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.06), transparent 50%)',
+    analytical: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.06), transparent 50%)',
     empathetic: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.06), transparent 50%)'
   }
-
-  const personaAccents = {
-    assertive: { primary: '#C23B22', dim: '#992B16' },
-    analytical: { primary: '#4A9D5B', dim: '#357A43' },
-    empathetic: { primary: '#C45B5B', dim: '#A04848' }
-  }
-
-  useEffect(() => {
-    const accents = personaAccents[activePreset] || personaAccents.empathetic
-    document.documentElement.style.setProperty('--gold', accents.primary)
-    document.documentElement.style.setProperty('--gold-dim', accents.dim)
-  }, [activePreset])
 
   useEffect(() => {
     fetch('/api/voice/presets')
