@@ -1,4 +1,4 @@
-# SpectreBot
+# SpecterBot
 
 > Ask questions about Canadian federal law in plain English. Get answers grounded in real statutory text — with the receipts to prove it.
 
