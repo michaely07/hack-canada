@@ -1,0 +1,1313 @@
+diff --git a/.env.example b/.env.example
+index debbd34..4da373c 100644
+--- a/.env.example
++++ b/.env.example
+@@ -1,7 +1,6 @@
+ # Environment Variables (example)
+ 
+ # Database
+-# Railway auto-injects DATABASE_URL when you provision PostgreSQL.
+ DATABASE_URL=postgresql://dev:dev@localhost:5433/statutelens
+ 
+ # LLM
+diff --git a/Dockerfile b/Dockerfile
+index 95421a2..5d0b1bd 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -17,9 +17,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
+ COPY requirements.txt .
+ RUN pip install --no-cache-dir -r requirements.txt
+ 
+-# Pre-download embedding model so cold starts are fast
+-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+-
+ COPY api/ ./api/
+ COPY etl/ ./etl/
+ COPY migrations/ ./migrations/
+@@ -30,4 +27,4 @@ COPY --from=frontend /app/client/dist ./static
+ ENV PORT=8001
+ EXPOSE 8001
+ 
+-CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8001}"]
++CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8001"]
+diff --git a/api/main.py b/api/main.py
+index e02ff68..5d8f5b1 100644
+--- a/api/main.py
++++ b/api/main.py
+@@ -1,43 +1,19 @@
+ """
+ StatuteLens — FastAPI application entry point.
+ """
+-import logging
+-import os
+ from contextlib import asynccontextmanager
+ from fastapi import FastAPI
+ from fastapi.middleware.cors import CORSMiddleware
+ from fastapi.staticfiles import StaticFiles
+-from fastapi.responses import JSONResponse
++from fastapi.responses import FileResponse
+ from api.config import settings
+-from api.db import init_pool, close_pool, get_pool
++from api.db import init_pool, close_pool
+ from api.services.embedder import init_embedder
+-import asyncpg
+-
+-logger = logging.getLogger("statutelens")
+ 
+ @asynccontextmanager
+ async def lifespan(app: FastAPI):
+-    # Startup validation
+-    if not settings.GEMINI_API_KEY:
+-        logger.warning("GEMINI_API_KEY is not set — /api/query endpoints will fail")
+-    if settings.CORS_ORIGINS == ["http://localhost:5173"]:
+-        logger.warning("CORS_ORIGINS is default localhost — update for production")
+-
++    # Startup
+     await init_pool(settings.DATABASE_URL)
+-
+-    # Auto-run migrations (all DDL is IF NOT EXISTS, safe to re-run)
+-    pool = get_pool()
+-    migration_path = os.path.join(os.path.dirname(__file__), "..", "migrations", "001_init.sql")
+-    if os.path.exists(migration_path):
+-        migration_sql = open(migration_path).read()
+-        # asyncpg execute() only supports single statements — split on semicolons
+-        async with pool.acquire() as conn:
+-            for statement in migration_sql.split(";"):
+-                stmt = statement.strip()
+-                if stmt and not stmt.startswith("--"):
+-                    await conn.execute(stmt)
+-        logger.info("Migrations applied successfully")
+-
+     init_embedder(settings.EMBEDDING_MODEL)
+     yield
+     # Shutdown
+@@ -57,6 +33,8 @@ app.add_middleware(
+     allow_methods=["*"],
+     allow_headers=["*"],
+ )
++from fastapi.responses import JSONResponse
++import asyncpg
+ 
+ @app.exception_handler(asyncpg.exceptions.PostgresError)
+ async def postgres_error_handler(request, exc):
+@@ -73,6 +51,7 @@ app.include_router(conversations.router, prefix="/api")
+ 
+ @app.get("/api/health")
+ async def health():
++    from api.db import get_pool
+     from api.services.embedder import get_embedder
+     try:
+         pool = get_pool()
+@@ -89,6 +68,15 @@ async def health():
+     except Exception:
+         return {"status": "ok", "db": False}
+ 
++# Serve the voice test page at root
++@app.get("/")
++async def serve_test_page():
++    import os
++    if os.path.exists("test_voice.html"):
++        return FileResponse("test_voice.html")
++    return {"message": "StatuteLens API"}
++
+ # Serve React static build in production
++import os
+ if os.path.isdir("static"):
+     app.mount("/", StaticFiles(directory="static", html=True), name="static")
+diff --git a/api/routers/conversations.py b/api/routers/conversations.py
+index 3c0cafd..2fcfd64 100644
+--- a/api/routers/conversations.py
++++ b/api/routers/conversations.py
+@@ -1,6 +1,5 @@
+ from fastapi import APIRouter
+ from api.db import get_pool
+-import uuid
+ 
+ router = APIRouter()
+ 
+@@ -9,14 +8,3 @@ async def create_conversation():
+     pool = get_pool()
+     row = await pool.fetchrow("INSERT INTO conversations DEFAULT VALUES RETURNING id, created_at")
+     return dict(row)
+-
+-
+-@router.get("/conversations/{conversation_id}/messages")
+-async def get_messages(conversation_id: str):
+-    pool = get_pool()
+-    rows = await pool.fetch(
+-        "SELECT role, content, citations, confidence, created_at FROM messages "
+-        "WHERE conversation_id = $1 ORDER BY created_at ASC",
+-        uuid.UUID(conversation_id),
+-    )
+-    return [dict(r) for r in rows]
+diff --git a/api/routers/query.py b/api/routers/query.py
+index a0da993..455e88c 100644
+--- a/api/routers/query.py
++++ b/api/routers/query.py
+@@ -9,52 +9,34 @@ from api.models.schemas import QueryRequest, QueryResponse, AnalyzeRequest
+ from groq import AsyncGroq
+ from api.config import settings
+ import json
+-import uuid
+ 
+ router = APIRouter()
+ 
+-
+-async def _get_or_create_conversation(pool, conversation_id: str | None) -> uuid.UUID:
+-    if conversation_id:
+-        return uuid.UUID(conversation_id)
+-    row = await pool.fetchrow("INSERT INTO conversations DEFAULT VALUES RETURNING id")
+-    return row["id"]
+-
+-
+-async def _fetch_history(pool, conv_id: uuid.UUID) -> list[dict]:
+-    rows = await pool.fetch(
+-        "SELECT role, content FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT 10",
+-        conv_id,
+-    )
+-    return [{"role": r["role"], "content": r["content"]} for r in reversed(rows)]
+-
+-
+-async def _save_message(pool, conv_id: uuid.UUID, role: str, content: str,
+-                        citations: list | None = None, confidence: str | None = None):
+-    await pool.execute(
+-        "INSERT INTO messages (conversation_id, role, content, citations, confidence) VALUES ($1, $2, $3, $4, $5)",
+-        conv_id, role, content,
+-        json.dumps(citations) if citations else None,
+-        confidence,
+-    )
+-
+-
+ @router.post("/query", response_model=QueryResponse)
+ async def query(req: QueryRequest):
+     pool = get_pool()
+-    conv_id = await _get_or_create_conversation(pool, req.conversation_id)
+-    history = await _fetch_history(pool, conv_id)
+ 
+-    await _save_message(pool, conv_id, "user", req.query)
++    # Get or create conversation for memory
++    conv_id = await get_or_create_conversation(pool, req.conversation_id)
++    history = await get_conversation_history(pool, conv_id)
++
++    # Reformulate query using conversation history for context
++    from api.services.rag import reformulate_query
++    search_query = await reformulate_query(req.query, history)
+ 
+-    sections = await hybrid_search(req.query, pool, top_k=5, language=req.language, law_code=req.law_code)
++    sections = await hybrid_search(search_query, pool, top_k=5, language=req.language, law_code=req.law_code)
+ 
+     if not sections:
+-        return {"answer": None, "reason": "NO_RESULTS", "citations": [], "confidence": "low",
+-                "conversation_id": str(conv_id)}
++        # Save the user message even if no results
++        await save_message(pool, conv_id, "user", req.query)
++        no_result_msg = "I couldn't find anything on that in the statutes I have loaded. Try rephrasing or ask about a specific act."
++        await save_message(pool, conv_id, "assistant", no_result_msg, confidence="low")
++        return {"answer": no_result_msg, "reason": "NO_RESULTS", "citations": [], "confidence": "low", "conversation_id": conv_id}
++
++    persona_prompt = PERSONA_PROMPTS.get(req.persona) if req.persona else None
+ 
+     try:
+-        result = await generate_response(req.query, sections, history)
++        result = await generate_response(req.query, sections, persona=persona_prompt, history=history)
+     except Exception as e:
+         raise HTTPException(status_code=503, detail=f"Groq API error: {str(e)}")
+ 
+@@ -62,31 +44,30 @@ async def query(req: QueryRequest):
+     await save_message(pool, conv_id, "user", req.query)
+     await save_message(pool, conv_id, "assistant", result.get("answer", ""), result.get("citations"), result.get("confidence"))
+ 
+-    await _save_message(pool, conv_id, "assistant", result.get("answer", ""),
+-                        result.get("citations", []), result.get("confidence", "low"))
+-
+-    result["conversation_id"] = str(conv_id)
++    result["conversation_id"] = conv_id
+     result["retrieved_sections"] = [
+         {"lims_id": s.lims_id, "label": s.label, "law_code": s.law_code, "score": s.combined_score}
+         for s in sections
+     ]
+     return result
+ 
+-
+ @router.post("/query/stream")
+ async def query_stream(req: QueryRequest):
+     pool = get_pool()
+-    conv_id = await _get_or_create_conversation(pool, req.conversation_id)
+-    history = await _fetch_history(pool, conv_id)
+ 
+-    await _save_message(pool, conv_id, "user", req.query)
++    # Get or create conversation for memory
++    conv_id = await get_or_create_conversation(pool, req.conversation_id)
++    history = await get_conversation_history(pool, conv_id)
++
++    # Reformulate query using conversation history for context
++    from api.services.rag import reformulate_query
++    search_query = await reformulate_query(req.query, history)
+ 
+-    sections = await hybrid_search(req.query, pool, top_k=5, language=req.language, law_code=req.law_code)
++    sections = await hybrid_search(search_query, pool, top_k=5, language=req.language, law_code=req.law_code)
+ 
+     if not sections:
+         await save_message(pool, conv_id, "user", req.query)
+         async def empty():
+-            yield {"event": "message", "data": json.dumps({"type": "conversation_id", "data": str(conv_id)})}
+             yield {"event": "message", "data": json.dumps({
+                 "type": "done",
+                 "data": {"answer": None, "reason": "NO_RESULTS", "citations": [], "confidence": "low", "conversation_id": conv_id}
+@@ -99,38 +80,31 @@ async def query_stream(req: QueryRequest):
+     await save_message(pool, conv_id, "user", req.query)
+ 
+     async def event_generator():
+-        yield {"event": "message", "data": json.dumps({"type": "conversation_id", "data": str(conv_id)})}
+-
+         full_text = ""
+-        final_citations = []
+-        final_confidence = "low"
+-
+         try:
+-            async for event in generate_response_stream(req.query, sections, history):
+-                yield {"event": "message", "data": json.dumps(event)}
++            # Emit retrieved sections immediately
++            retrieved_data = [
++                {"lims_id": s.lims_id, "label": s.label, "law_code": s.law_code, "score": s.combined_score}
++                for s in sections
++            ]
++            yield {"event": "message", "data": json.dumps({"type": "retrieved_sections", "data": retrieved_data})}
++
++            async for event in generate_response_stream(req.query, sections, persona=persona_prompt, history=history):
+                 if event["type"] == "token":
+                     full_text += event["data"]
+-                elif event["type"] == "citations":
+-                    final_citations = event["data"]
+-                elif event["type"] == "confidence":
+-                    final_confidence = event["data"]
+-        except Exception as e:
+-            yield {"event": "error", "data": json.dumps({"detail": f"Gemini API error: {str(e)}"})}
+-            return
++                yield {"event": "message", "data": json.dumps(event)}
+ 
+-        # Extract answer text from accumulated JSON
+-        answer_text = full_text
+-        try:
+-            raw = full_text.strip()
+-            if raw.startswith("```"):
+-                raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+-            parsed = json.loads(raw)
+-            answer_text = parsed.get("answer", full_text)
+-        except (json.JSONDecodeError, IndexError):
+-            pass
+-
+-        await _save_message(pool, conv_id, "assistant", answer_text,
+-                            final_citations, final_confidence)
++            # After streaming completes, save the assistant's response
++            try:
++                parsed = json.loads(full_text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip())
++                await save_message(pool, conv_id, "assistant", parsed.get("answer", full_text), parsed.get("citations"), parsed.get("confidence"))
++            except (json.JSONDecodeError, Exception):
++                await save_message(pool, conv_id, "assistant", full_text)
++
++            # Send conversation_id to frontend
++            yield {"event": "message", "data": json.dumps({"type": "conversation_id", "data": conv_id})}
++        except Exception as e:
++            yield {"event": "error", "data": json.dumps({"detail": f"Groq API error: {str(e)}"})}
+ 
+     return EventSourceResponse(event_generator())
+ 
+diff --git a/api/routers/voice.py b/api/routers/voice.py
+index d885aff..c140de8 100644
+--- a/api/routers/voice.py
++++ b/api/routers/voice.py
+@@ -22,9 +22,43 @@ from groq import AsyncGroq
+ 
+ router = APIRouter(prefix="/api/voice", tags=["voice"])
+ 
+-if settings.GEMINI_API_KEY:
+-    genai.configure(api_key=settings.GEMINI_API_KEY)
+-    gemini_model = genai.GenerativeModel("gemini-2.0-flash")
++if settings.GROQ_API_KEY:
++    groq_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
++
++# ── Lawyer Voice Presets ──────────────────────────────────────────────
++VOICE_PRESETS = [
++    {
++        "id": "empathetic",
++        "name": "The Counselor",
++        "description": "Warm and approachable — explains in plain language",
++        "voice_id": "ErXwobaYiN019PkySvjV",
++        "persona_prompt": "TONE: You are warm and approachable. Explain legal concepts as if talking to a friend. Use phrases like \"In simple terms, what this means for you is...\" or \"Don't worry, let me walk you through this...\" Prioritize making the law accessible and understandable.",
++    },
++    {
++        "id": "assertive",
++        "name": "The Advocate",
++        "description": "Confident and direct — gets straight to the point",
++        "voice_id": settings.ELEVENLABS_VOICE_ID,
++        "persona_prompt": "TONE: You are assertive and confident. Be direct and decisive. Use phrases like \"The law is clear on this...\" or \"Under the statute, there is no ambiguity...\" Keep explanations sharp and to the point. You project authority.",
++    },
++    {
++        "id": "analytical",
++        "name": "The Scholar",
++        "description": "Calm and precise — methodical legal analysis",
++        "voice_id": "TBt8U1ufDfjfOcYYUUrU",
++        "persona_prompt": "TONE: You are methodical and scholarly. Break down the analysis step by step. Use phrases like \"Let us examine this carefully...\" or \"The statute can be broken down into three key elements...\" You value precision and thoroughness.",
++    },
++]
++
++# Build a lookup for persona prompts
++PERSONA_PROMPTS = {p["id"]: p["persona_prompt"] for p in VOICE_PRESETS}
++
++
++@router.get("/presets")
++async def get_voice_presets():
++    """Return available lawyer voice presets."""
++    return {"presets": VOICE_PRESETS}
++
+ 
+ class TTSRequest(BaseModel):
+     text: str
+diff --git a/api/services/rag.py b/api/services/rag.py
+index 047654f..467bad4 100644
+--- a/api/services/rag.py
++++ b/api/services/rag.py
+@@ -33,33 +33,76 @@ CONFIDENCE LEVELS:
+ 
+ REFORMULATION_PROMPT = """Given the following conversation history and a new user question, rewrite the user's question into a standalone, comprehensive search query that can be understood without the conversation history.
+ 
+-def build_prompt(query: str, sections: list[SectionResult], history: list[dict] | None = None) -> str:
++DO NOT answer the question. ONLY output the rewritten search query.
++If the new user question is already self-contained or is changing the topic entirely, just output the new question as-is.
++
++Make sure to include implicit context (e.g., "taxes" -> "federal income tax", "assault" -> "criminal code assault")."""
++
++
++async def reformulate_query(query: str, history: list[dict] | None = None) -> str:
++    if not history:
++        return query
++
++    # Only look at the last few turns for context
++    turns = []
++    for msg in history[-4:]:
++        role = "User" if msg["role"] == "user" else "Assistant"
++        turns.append(f"{role}: {msg['content']}")
++    history_block = "\n".join(turns)
++
++    prompt = f"{REFORMULATION_PROMPT}\n\nCONVERSATION HISTORY:\n{history_block}\n\nNEW QUESTION: {query}\n\nREWRITTEN QUERY:"
++    
++    try:
++        response = await client.chat.completions.create(
++            model="llama-3.3-70b-versatile",
++            messages=[{"role": "user", "content": prompt}],
++            temperature=0.1,
++            max_tokens=100
++        )
++        reformulated = response.choices[0].message.content.strip()
++        # Clean up any quotes the LLM might have added
++        if reformulated.startswith('"') and reformulated.endswith('"'):
++            reformulated = reformulated[1:-1]
++        return reformulated
++    except Exception:
++        # Fallback to the original query if the LLM fails
++        return query
++
++
++def build_prompt(query: str, sections: list[SectionResult], persona: str | None = None, history: list[dict] | None = None) -> str:
+     context_blocks = "\n---\n".join(
+         f"[{s.law_title} | Section {s.label} | lims_id: {s.lims_id}]\n{s.content_text}"
+         for s in sections
+     )
++    persona_block = f"\n\n{persona}" if persona else ""
+ 
++    # Include recent conversation history for context
+     history_block = ""
+     if history:
+-        lines = []
+-        for msg in history[-10:]:
+-            role_label = "USER" if msg["role"] == "user" else "ASSISTANT"
+-            lines.append(f"{role_label}: {msg['content']}")
+-        history_block = f"\nCONVERSATION HISTORY:\n" + "\n".join(lines) + "\n"
+-
+-    return f"""{SYSTEM_PROMPT}
+-{history_block}
++        turns = []
++        for msg in history[-6:]:  # last 3 exchanges (6 messages)
++            role = "User" if msg["role"] == "user" else "You"
++            turns.append(f"{role}: {msg['content']}")
++        history_block = f"\n\nRECENT CONVERSATION:\n" + "\n".join(turns)
++
++    return f"""{SYSTEM_PROMPT}{persona_block}{history_block}
++
+ CONTEXT BLOCKS:
+ {context_blocks}
+ 
+ USER QUESTION: {query}"""
+ 
+ 
+-async def generate_response(query: str, sections: list[SectionResult], history: list[dict] | None = None) -> dict:
+-    prompt = build_prompt(query, sections, history)
+-    response = model.generate_content(
+-        prompt, 
+-        generation_config={"response_mime_type": "application/json"}
++async def generate_response(query: str, sections: list[SectionResult], persona: str | None = None, history: list[dict] | None = None) -> dict:
++    prompt = build_prompt(query, sections, persona, history)
++    
++    # Require JSON output in prompt to use json_object mode
++    json_instruction = "\n\nYou must return your response in the requested strict JSON format."
++    
++    response = await client.chat.completions.create(
++        model=MODEL_NAME,
++        messages=[{"role": "user", "content": prompt + json_instruction}],
++        response_format={"type": "json_object"}
+     )
+     
+     raw = response.choices[0].message.content.strip()
+@@ -82,12 +125,17 @@ async def generate_response(query: str, sections: list[SectionResult], history:
+     return parsed
+ 
+ 
+-async def generate_response_stream(query: str, sections: list[SectionResult], history: list[dict] | None = None):
+-    prompt = build_prompt(query, sections, history)
+-    response = model.generate_content(
+-        prompt, 
+-        stream=True, 
+-        generation_config={"response_mime_type": "application/json"}
++async def generate_response_stream(query: str, sections: list[SectionResult], persona: str | None = None, history: list[dict] | None = None):
++    prompt = build_prompt(query, sections, persona, history)
++    
++    # Require JSON output in prompt to use json_object mode
++    json_instruction = "\n\nYou must return your response in the requested strict JSON format."
++    
++    stream = await client.chat.completions.create(
++        model=MODEL_NAME,
++        messages=[{"role": "user", "content": prompt + json_instruction}],
++        response_format={"type": "json_object"},
++        stream=True
+     )
+     
+     full_text = ""
+diff --git a/client/index.html b/client/index.html
+index 207769b..7d5d87c 100644
+--- a/client/index.html
++++ b/client/index.html
+@@ -1,13 +1,18 @@
+ <!doctype html>
+ <html lang="en">
+-  <head>
+-    <meta charset="UTF-8" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+-    <title>StatuteLens</title>
+-  </head>
+-  <body>
+-    <div id="root"></div>
+-    <script type="module" src="/src/main.jsx"></script>
+-  </body>
+-</html>
++
++<head>
++  <meta charset="UTF-8" />
++  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++  <link
++    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
++    rel="stylesheet">
++  <title>StatuteLens</title>
++</head>
++
++<body>
++  <div id="root"></div>
++  <script type="module" src="/src/main.jsx"></script>
++</body>
++
++</html>
+\ No newline at end of file
+diff --git a/client/src/components/chat/ChatPane.jsx b/client/src/components/chat/ChatPane.jsx
+index 2db95cc..0fd99c6 100644
+--- a/client/src/components/chat/ChatPane.jsx
++++ b/client/src/components/chat/ChatPane.jsx
+@@ -17,10 +17,10 @@ export default function ChatPane() {
+         {messages.length === 0 && (
+           <div className="flex items-center justify-center h-full">
+             <div className="text-center">
+-              <h2 className="text-2xl mb-2" style={{ color: 'var(--gold)', fontFamily: "'Playfair Display', serif" }}>
++              <h2 className="text-2xl mb-2" style={{ color: 'var(--gold)' }}>
+                 Ask a legal question
+               </h2>
+-              <p style={{ color: 'var(--text-secondary)', fontFamily: "'Lora', serif" }}>
++              <p style={{ color: 'var(--text-secondary)' }}>
+                 Answers are grounded in Canadian federal statutes
+               </p>
+             </div>
+diff --git a/client/src/components/chat/MessageBubble.jsx b/client/src/components/chat/MessageBubble.jsx
+index 6152f5e..26afd3a 100644
+--- a/client/src/components/chat/MessageBubble.jsx
++++ b/client/src/components/chat/MessageBubble.jsx
+@@ -81,20 +81,12 @@ export default function MessageBubble({ message }) {
+ function renderWithCitations(text, citations) {
+   if (!text || !citations?.length) return text
+ 
+-  // Match patterns like [Section 266(a)], [Criminal Code, Section 267], etc.
+-  const parts = text.split(/(\[[^\]]*Section [^\]]+\])/g)
++  const parts = text.split(/(\[Section [^\]]+\])/g)
+   return parts.map((part, i) => {
+-    const match = part.match(/\[(?:[^,\]]+,\s*)?Section ([^\]]+)\]/)
++    const match = part.match(/\[Section ([^\]]+)\]/)
+     if (match) {
+-      const ref = match[1].trim()
+-      const citation = citations.find(c => {
+-        if (c.label === ref) return true
+-        // Match base section number: "266(a)" should match citation label "266"
+-        const baseRef = ref.replace(/\(.*$/, '')
+-        if (c.label === baseRef) return true
+-        // Check if the reference text contains the citation label
+-        return ref.includes(c.label)
+-      })
++      const label = match[1]
++      const citation = citations.find(c => c.label === label || part.includes(c.label))
+       if (citation) {
+         return <CitationBadge key={i} citation={citation} inline />
+       }
+diff --git a/client/src/components/chat/QueryInput.jsx b/client/src/components/chat/QueryInput.jsx
+index 5b799e4..db1a41e 100644
+--- a/client/src/components/chat/QueryInput.jsx
++++ b/client/src/components/chat/QueryInput.jsx
+@@ -5,7 +5,8 @@ export default function QueryInput() {
+   const [input, setInput] = useState('')
+   const [lawCode, setLawCode] = useState('')
+   const [laws, setLaws] = useState([])
+-  const [focused, setFocused] = useState(false)
++  const [searchQuery, setSearchQuery] = useState('')
++  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+   const { sendQuery, isLoading } = useChatStore()
+ 
+   useEffect(() => {
+@@ -28,54 +29,141 @@ export default function QueryInput() {
+   }
+ 
+   return (
+-    <form
+-      onSubmit={handleSubmit}
+-      className="p-4"
+-      style={{
+-        borderTop: '1px solid rgba(201, 168, 76, 0.12)',
+-        background: 'linear-gradient(to top, rgba(10, 22, 40, 0.5), transparent)',
+-      }}
+-    >
+-      <div className="flex gap-2">
+-        <select
+-          value={lawCode}
+-          onChange={e => setLawCode(e.target.value)}
+-          className="px-3 py-2.5 rounded-lg text-sm outline-none"
+-          style={{
+-            background: 'var(--navy-light)',
+-            color: 'var(--text-primary)',
+-            border: '1px solid rgba(201, 168, 76, 0.15)',
+-            minWidth: '140px',
+-            fontFamily: "'Lora', serif",
+-          }}
+-        >
+-          <option value="">All Laws</option>
+-          {laws.map(law => (
+-            <option key={law.code} value={law.code}>
+-              {law.code} - {law.short_title_en}
+-            </option>
+-          ))}
+-        </select>
++    <form onSubmit={handleSubmit} className="p-4 border-t relative" style={{ borderColor: 'var(--navy-lighter)' }}>
++      {/* Subtle top border glow for the search area */}
++      <div className="absolute top-0 left-0 right-0 h-[1px]"
++        style={{ background: 'linear-gradient(90deg, transparent, var(--navy-lighter), transparent)' }} />
++      <div className="flex gap-3" onClick={e => e.stopPropagation()}>
++        <div className="relative">
++          <button
++            type="button"
++            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
++            className="px-3 py-2.5 rounded-lg text-sm text-left outline-none flex items-center justify-between"
++            style={{
++              background: 'var(--navy-lighter)',
++              color: 'var(--text-primary)',
++              border: `1px solid ${isDropdownOpen ? 'var(--gold-dim)' : 'var(--navy-lighter)'}`,
++              minWidth: '180px',
++              maxWidth: '220px',
++              whiteSpace: 'nowrap',
++              overflow: 'hidden',
++              textOverflow: 'ellipsis'
++            }}
++          >
++            <span className="truncate">
++              {lawCode ? laws.find(l => l.code === lawCode)?.short_title_en || lawCode : 'All Laws'}
++            </span>
++            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, flexShrink: 0, marginLeft: '8px' }}>
++              <polyline points="6 9 12 15 18 9"></polyline>
++            </svg>
++          </button>
++
++          {isDropdownOpen && (
++            <div className="absolute bottom-[calc(100%+8px)] left-0 w-[300px] rounded-lg shadow-xl border overflow-hidden flex flex-col z-50"
++              style={{
++                background: 'var(--navy)',
++                borderColor: 'var(--navy-lighter)',
++                maxHeight: '300px'
++              }}
++            >
++              <div className="p-2 border-b" style={{ borderColor: 'var(--navy-lighter)', background: 'var(--navy-light)' }}>
++                <input
++                  type="text"
++                  placeholder="Search laws..."
++                  value={searchQuery}
++                  onChange={e => setSearchQuery(e.target.value)}
++                  className="w-full px-3 py-1.5 rounded text-sm outline-none"
++                  style={{
++                    background: 'var(--navy)',
++                    color: 'var(--text-primary)',
++                    border: '1px solid var(--navy-lighter)'
++                  }}
++                  autoFocus
++                  onClick={e => e.stopPropagation()}
++                />
++              </div>
++              <div className="flex-1 overflow-y-auto">
++                <button
++                  type="button"
++                  onClick={() => {
++                    setLawCode('')
++                    setIsDropdownOpen(false)
++                    setSearchQuery('')
++                  }}
++                  className="w-full text-left px-3 py-2 text-sm hover:bg-opacity-50 transition-colors"
++                  style={{
++                    background: !lawCode ? 'rgba(201, 168, 76, 0.1)' : 'transparent',
++                    color: !lawCode ? 'var(--gold)' : 'var(--text-primary)'
++                  }}
++                >
++                  All Laws
++                </button>
++                {laws
++                  .filter(law =>
++                    law.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
++                    law.short_title_en.toLowerCase().includes(searchQuery.toLowerCase())
++                  )
++                  .map(law => (
++                    <button
++                      key={law.code}
++                      type="button"
++                      onClick={() => {
++                        setLawCode(law.code)
++                        setIsDropdownOpen(false)
++                        setSearchQuery('')
++                      }}
++                      className="w-full text-left px-3 py-2 text-sm hover:bg-opacity-50 transition-colors truncate"
++                      style={{
++                        background: lawCode === law.code ? 'rgba(201, 168, 76, 0.1)' : 'transparent',
++                        color: lawCode === law.code ? 'var(--gold)' : 'var(--text-primary)'
++                      }}
++                      title={law.short_title_en}
++                    >
++                      {law.code} - {law.short_title_en}
++                    </button>
++                  ))}
++                {laws.filter(law => law.code.toLowerCase().includes(searchQuery.toLowerCase()) || law.short_title_en.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
++                  <div className="px-3 py-3 text-sm text-center" style={{ color: 'var(--text-secondary)' }}>
++                    No laws found
++                  </div>
++                )}
++              </div>
++            </div>
++          )}
++        </div>
+         <input
+           value={input}
+           onChange={e => setInput(e.target.value)}
+           placeholder="Ask a question or enter a query..."
+           disabled={isLoading}
+-          className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none transition-all duration-200"
++          className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none transition-all duration-300"
+           style={{
+-            background: 'var(--navy-light)',
++            background: 'rgba(26, 48, 88, 0.4)', // Slightly transparent var(--navy-lighter)
+             color: 'var(--text-primary)',
+-            border: focused ? '1px solid var(--gold-dim)' : '1px solid rgba(201, 168, 76, 0.15)',
+-            boxShadow: focused ? '0 0 12px rgba(201, 168, 76, 0.1)' : 'none',
+-            fontFamily: "'Lora', serif",
++            border: '1px solid var(--navy-lighter)',
++            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
++          }}
++          onFocus={e => {
++            e.target.style.borderColor = 'var(--gold-dim)'
++            e.target.style.background = 'rgba(26, 48, 88, 0.6)'
++            e.target.style.boxShadow = '0 0 0 1px var(--gold-dim), inset 0 2px 4px rgba(0,0,0,0.1)'
++          }}
++          onBlur={e => {
++            e.target.style.borderColor = 'var(--navy-lighter)'
++            e.target.style.background = 'rgba(26, 48, 88, 0.4)'
++            e.target.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.1)'
+           }}
+-          onFocus={() => setFocused(true)}
+-          onBlur={() => setFocused(false)}
+         />
+         <button
+           type="submit"
+           disabled={isLoading || !input.trim()}
+-          className="search-btn px-5 py-2.5 rounded-lg text-sm"
++          className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 shadow-lg flex items-center gap-2 ${input.trim() ? 'hover:-translate-y-0.5 hover:shadow-xl' : ''}`}
++          style={{
++            background: input.trim() ? 'linear-gradient(135deg, var(--gold), var(--gold-dim))' : 'var(--navy-lighter)',
++            color: input.trim() ? '#112240' : 'var(--text-secondary)',
++            border: `1px solid ${input.trim() ? 'transparent' : 'var(--navy-lighter)'}`,
++            opacity: isLoading ? 0.7 : 1
++          }}
+         >
+           {isLoading ? 'Searching...' : 'Search'}
+         </button>
+diff --git a/client/src/components/layout/AppShell.jsx b/client/src/components/layout/AppShell.jsx
+index d95eb24..fa95d83 100644
+--- a/client/src/components/layout/AppShell.jsx
++++ b/client/src/components/layout/AppShell.jsx
+@@ -5,19 +5,6 @@ import StatusBar from './StatusBar'
+ import { useChatStore } from '../../stores/chatStore'
+ import { useAuditorStore } from '../../stores/auditorStore'
+ 
+-function MapleLeaf() {
+-  return (
+-    <img
+-      className="maple-leaf"
+-      src="https://static.vecteezy.com/system/resources/previews/034/169/496/non_2x/canadian-maple-leaf-isolated-on-a-transparent-background-free-png.png"
+-      alt="Canadian Maple Leaf"
+-      width="32"
+-      height="32"
+-      style={{ objectFit: 'contain' }}
+-    />
+-  )
+-}
+-
+ export default function AppShell() {
+   const { activeTab, setActiveTab } = useAuditorStore()
+   const { isAudioPlaying, stopAudio, setSelectedVoiceId, setSelectedPresetId } = useChatStore()
+@@ -67,15 +54,23 @@ export default function AppShell() {
+   }
+ 
+   return (
+-    <div className="h-screen flex flex-col" style={{ background: 'var(--navy)' }}>
+-      <header className="flex items-center justify-between px-6 py-3 border-b"
+-              style={{ borderColor: 'rgba(201, 168, 76, 0.12)' }}>
++    <div className="h-screen flex flex-col relative overflow-hidden bg-transparent">
++      {/* Persona Tint Background Overlay */}
++      <div
++        className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out"
++        style={{
++          background: personaTints[activePreset] || 'transparent',
++          zIndex: 0
++        }}
++      />
++
++      <header className="flex items-center justify-between px-6 py-3 relative z-10">
+         <div className="flex items-center gap-4">
+           <div className="flex items-center gap-3">
+-            <h1 className="text-xl font-semibold tracking-wide" style={{ color: 'var(--gold)' }}>
++            <h1 className="text-xl font-semibold" style={{ color: 'var(--gold)' }}>
+               StatuteLens
+             </h1>
+-            <span className="text-sm" style={{ color: 'var(--text-secondary)', fontFamily: "'Lora', serif" }}>
++            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+               Canadian Federal Law
+             </span>
+           </div>
+@@ -96,12 +91,42 @@ export default function AppShell() {
+           )}
+         </div>
+ 
+-        <MapleLeaf />
++        {/* Voice Preset Selector */}
++        {presets.length > 0 && (
++          <div className="flex items-center gap-2">
++            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Counsel:</span>
++            <div className="flex gap-1">
++              {presets.map(p => (
++                <button
++                  key={p.id}
++                  onClick={() => handlePresetChange(p.id)}
++                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
++                  style={{
++                    background: activePreset === p.id ? 'rgba(201, 168, 76, 0.15)' : 'transparent',
++                    color: activePreset === p.id ? 'var(--gold)' : 'var(--text-secondary)',
++                    border: `1px solid ${activePreset === p.id ? 'var(--gold-dim)' : 'var(--navy-lighter)'}`,
++                  }}
++                  title={p.description}
++                >
++                  {p.name}
++                </button>
++              ))}
++            </div>
++          </div>
++        )}
+       </header>
+ 
+-      <div className="flex flex-1 overflow-hidden">
+-        {/* Chat panel — 60% */}
+-        <div className="flex flex-col" style={{ width: '60%' }}>
++      {/* Glowing Horizontal Separation Bar */}
++      <div className="w-full h-[1px] relative z-20"
++        style={{
++          background: 'linear-gradient(to right, transparent, var(--gold-dim), transparent)',
++          opacity: 0.5,
++          boxShadow: '0 0 8px var(--gold-dim)'
++        }}
++      />
++
++      <div className="flex flex-1 overflow-hidden relative z-10">
++        <div className="w-[60%] flex flex-col relative">
+           <ChatPane />
+           {/* Glowing Divider */}
+           <div className="absolute right-0 top-0 bottom-0 w-[1px]"
+@@ -113,18 +138,15 @@ export default function AppShell() {
+           />
+         </div>
+ 
+-        {/* Glowing divider */}
+-        <div className="panel-divider" />
+-
+-        {/* Source viewer — 40% */}
+-        <div className="flex flex-col" style={{ width: '40%' }}>
+-          <div className="flex border-b" style={{ borderColor: 'rgba(201, 168, 76, 0.12)' }}>
++        <div className="w-[40%] flex flex-col bg-opacity-50" style={{ background: 'var(--navy-light)' }}>
++          <div className="flex border-b" style={{ borderColor: 'var(--navy-lighter)', background: 'var(--navy)' }}>
+             <button
+               onClick={() => setActiveTab('source')}
+-              className={`tab-button px-5 py-2.5 text-sm font-medium ${activeTab === 'source' ? 'active' : ''}`}
++              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'source' ? 'border-b-2' : 'hover:bg-white/5'}`}
+               style={{
++                borderColor: activeTab === 'source' ? 'var(--gold)' : 'transparent',
+                 color: activeTab === 'source' ? 'var(--gold)' : 'var(--text-secondary)',
+-                borderBottom: 'none',
++                opacity: activeTab === 'source' ? 1 : 0.7
+               }}
+             >
+               Source Viewer
+@@ -142,10 +164,11 @@ export default function AppShell() {
+             </button>
+             <button
+               onClick={() => setActiveTab('graph')}
+-              className={`tab-button px-5 py-2.5 text-sm font-medium ${activeTab === 'graph' ? 'active' : ''}`}
++              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'graph' ? 'border-b-2' : 'hover:bg-white/5'}`}
+               style={{
++                borderColor: activeTab === 'graph' ? 'var(--gold)' : 'transparent',
+                 color: activeTab === 'graph' ? 'var(--gold)' : 'var(--text-secondary)',
+-                borderBottom: 'none',
++                opacity: activeTab === 'graph' ? 1 : 0.7
+               }}
+             >
+               Legal Graph
+diff --git a/client/src/components/layout/StatusBar.jsx b/client/src/components/layout/StatusBar.jsx
+index e224f7e..7d35e30 100644
+--- a/client/src/components/layout/StatusBar.jsx
++++ b/client/src/components/layout/StatusBar.jsx
+@@ -15,12 +15,12 @@ export default function StatusBar() {
+   }[confidence] || 'var(--text-secondary)'
+ 
+   return (
+-    <div className="flex items-center justify-between px-6 py-2 text-xs"
+-         style={{
+-           borderTop: '1px solid rgba(201, 168, 76, 0.12)',
+-           color: 'var(--text-secondary)',
+-           fontFamily: "'Lora', serif",
+-         }}>
++    <div className="flex items-center justify-between px-6 py-3 text-xs border-t bg-opacity-50"
++      style={{
++        borderColor: 'var(--navy-lighter)',
++        background: 'var(--navy-light)',
++        color: 'var(--text-secondary)'
++      }}>
+       <div className="flex items-center gap-4">
+         {confidence && (
+           <span>
+@@ -31,8 +31,8 @@ export default function StatusBar() {
+           <span>{citationCount} section{citationCount !== 1 ? 's' : ''} cited</span>
+         )}
+       </div>
+-      <span style={{ color: 'var(--gold-dim)', letterSpacing: '0.03em' }}>
+-        Powered by Gemini + Canadian Federal Law XML
++      <span className="font-medium tracking-wide" style={{ color: 'var(--gold-dim)', opacity: 0.8 }}>
++        Powered by Gemini and Groq + Canadian Federal Law XML
+       </span>
+     </div>
+   )
+diff --git a/client/src/index.css b/client/src/index.css
+index dc77e48..53d12f8 100644
+--- a/client/src/index.css
++++ b/client/src/index.css
+@@ -6,12 +6,10 @@
+   --navy-lighter: #1A3058;
+   --gold: #C9A84C;
+   --gold-dim: #9A7D3A;
+-  --gold-glow: rgba(201, 168, 76, 0.15);
+   --text-primary: #E8E4DC;
+   --text-secondary: #9BA4B5;
+   --red: #C23B22;
+   --green: #4A9D5B;
+-  --maple-red: #D32F2F;
+ }
+ 
+ * {
+@@ -21,30 +19,21 @@
+ body {
+   background: radial-gradient(circle at 30% 50%, #112240 0%, var(--navy) 100%);
+   color: var(--text-primary);
+-  font-family: 'Lora', 'Georgia', serif;
++  font-family: 'Lora', serif;
+   position: relative;
+ }
+ 
+-/* Subtle noise grain overlay */
+ body::before {
+-  content: '';
+-  position: fixed;
+-  inset: 0;
++  content: "";
++  position: absolute;
++  top: 0;
++  left: 0;
++  right: 0;
++  bottom: 0;
++  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+   opacity: 0.03;
+   pointer-events: none;
+-  z-index: 9999;
+-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+-  background-repeat: repeat;
+-}
+-
+-/* Radial gradient depth for the chat area */
+-body::after {
+-  content: '';
+-  position: fixed;
+-  inset: 0;
+-  pointer-events: none;
+   z-index: 0;
+-  background: radial-gradient(ellipse 70% 60% at 30% 50%, rgba(19, 34, 64, 0.6) 0%, transparent 70%);
+ }
+ 
+ #root {
+@@ -52,96 +41,45 @@ body::after {
+   z-index: 1;
+ }
+ 
+-h1, h2, h3, h4 { font-family: 'Playfair Display', 'Georgia', serif; }
+-code, .mono { font-family: 'IBM Plex Mono', monospace; }
+-
+-/* Maple leaf pulse animation */
+-@keyframes maple-pulse {
+-  0%, 100% { filter: drop-shadow(0 0 4px rgba(211, 47, 47, 0.3)); }
+-  50% { filter: drop-shadow(0 0 10px rgba(211, 47, 47, 0.6)); }
++h1,
++h2,
++h3,
++h4 {
++  font-family: 'Playfair Display', serif;
+ }
+ 
+-.maple-leaf {
+-  animation: maple-pulse 3s ease-in-out infinite;
++code,
++.mono {
++  font-family: 'IBM Plex Mono', monospace;
+ }
+ 
+-/* Divider glow */
+-.panel-divider {
+-  width: 1px;
+-  background: linear-gradient(
+-    to bottom,
+-    transparent 0%,
+-    var(--gold-dim) 15%,
+-    var(--gold) 50%,
+-    var(--gold-dim) 85%,
+-    transparent 100%
+-  );
+-  opacity: 0.4;
+-  flex-shrink: 0;
+-}
+-
+-/* Tab hover preview */
+-.tab-button {
+-  position: relative;
+-  transition: color 0.2s ease, border-color 0.2s ease;
+-}
+-
+-.tab-button::after {
+-  content: '';
+-  position: absolute;
+-  bottom: 0;
+-  left: 0;
+-  right: 0;
+-  height: 2px;
+-  background: var(--gold);
+-  opacity: 0;
+-  transition: opacity 0.2s ease;
+-}
+-
+-.tab-button:hover::after {
+-  opacity: 0.4;
+-}
+-
+-.tab-button.active::after {
+-  opacity: 1;
+-}
+-
+-/* Premium search button */
+-.search-btn {
+-  background: linear-gradient(135deg, var(--gold) 0%, #B8943F 100%);
+-  color: var(--navy);
+-  font-weight: 600;
+-  transition: all 0.2s ease;
+-  box-shadow: 0 2px 8px rgba(201, 168, 76, 0.2);
+-}
+-
+-.search-btn:hover:not(:disabled) {
+-  background: linear-gradient(135deg, #D4B45C 0%, var(--gold) 100%);
+-  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.35);
+-  transform: translateY(-1px);
+-}
+-
+-.search-btn:disabled {
+-  background: var(--navy-lighter);
+-  color: var(--text-secondary);
+-  box-shadow: none;
+-  transform: none;
+-}
+-
+-/* Scrollbar styling */
++/* Custom Scrollbar Styles */
+ ::-webkit-scrollbar {
+-  width: 6px;
++  width: 8px;
++  height: 8px;
+ }
+ 
+ ::-webkit-scrollbar-track {
+-  background: transparent;
++  background: var(--navy);
+ }
+ 
+ ::-webkit-scrollbar-thumb {
+   background: var(--navy-lighter);
+-  border-radius: 3px;
++  border-radius: 4px;
+ }
+ 
+ ::-webkit-scrollbar-thumb:hover {
+   background: var(--gold-dim);
+ }
++
++@keyframes waveform {
++
++  0%,
++  100% {
++    transform: scaleY(0.4);
++  }
++
++  50% {
++    transform: scaleY(1);
++  }
++}
+\ No newline at end of file
+diff --git a/client/src/stores/chatStore.js b/client/src/stores/chatStore.js
+index a84a36f..4bba90f 100644
+--- a/client/src/stores/chatStore.js
++++ b/client/src/stores/chatStore.js
+@@ -1,41 +1,5 @@
+ import { create } from 'zustand'
+ 
+-/**
+- * Extract the answer text from a partial JSON string being streamed.
+- * Gemini outputs: {"answer": "text...", "citations": [...]}
+- * We pull out just the answer value for clean display during streaming.
+- */
+-function extractAnswerFromPartialJson(raw) {
+-  const marker = '"answer"'
+-  const idx = raw.indexOf(marker)
+-  if (idx === -1) return null
+-
+-  const afterKey = raw.indexOf(':', idx + marker.length)
+-  if (afterKey === -1) return null
+-
+-  const rest = raw.substring(afterKey + 1).trimStart()
+-  if (rest.startsWith('null')) return null
+-  if (!rest.startsWith('"')) return null
+-
+-  let text = ''
+-  let i = 1 // skip opening quote
+-  while (i < rest.length) {
+-    if (rest[i] === '\\' && i + 1 < rest.length) {
+-      const next = rest[i + 1]
+-      if (next === 'n') { text += '\n'; i += 2; continue }
+-      if (next === 't') { text += '\t'; i += 2; continue }
+-      if (next === '"') { text += '"'; i += 2; continue }
+-      if (next === '\\') { text += '\\'; i += 2; continue }
+-      text += next; i += 2; continue
+-    }
+-    if (rest[i] === '"') break
+-    text += rest[i]
+-    i++
+-  }
+-
+-  return text || null
+-}
+-
+ // Separate audio element just for unlocking browser autoplay policy
+ const _unlockAudio = new Audio()
+ 
+@@ -59,6 +23,7 @@ export const useChatStore = create((set, get) => ({
+ 
+   setLoading: (loading) => set({ isLoading: loading }),
+   setStreamingContent: (content) => set({ streamingContent: content }),
++  appendStreamingContent: (text) => set(s => ({ streamingContent: s.streamingContent + text })),
+ 
+   stopAudio: () => {
+     const { _audio } = get()
+@@ -131,10 +96,8 @@ export const useChatStore = create((set, get) => ({
+     }
+   },
+ 
+-  clearConversation: () => set({ messages: [], conversationId: null, streamingContent: '' }),
+-
+   sendQuery: async (query, lawCode = null) => {
+-    const { addMessage, setLoading, setStreamingContent } = get()
++    const { addMessage, setLoading, setStreamingContent, appendStreamingContent } = get()
+ 
+     // Unlock browser audio context synchronously on user click
+     // Uses a separate element so it can't interfere with real playback
+@@ -149,20 +112,16 @@ export const useChatStore = create((set, get) => ({
+       const res = await fetch('/api/query/stream', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+-        body: JSON.stringify({ query, language: 'en', law_code: lawCode, conversation_id: get().conversationId }),
++        body: JSON.stringify({ query, language: 'en', law_code: lawCode, persona: get().selectedPresetId, conversation_id: get().conversationId }),
+       })
+ 
+-      if (!res.ok) {
+-        throw new Error(`HTTP ${res.status}`)
+-      }
+-
+       const reader = res.body.getReader()
+       const decoder = new TextDecoder()
+       let buffer = ''
+       let fullText = ''
+       let citations = []
+       let confidence = 'low'
+-      let streamError = null
++      let retrieved_sections = []
+ 
+       while (true) {
+         const { done, value } = await reader.read()
+@@ -179,58 +138,38 @@ export const useChatStore = create((set, get) => ({
+ 
+           try {
+             const event = JSON.parse(jsonStr)
+-            if (event.type === 'conversation_id') {
+-              set({ conversationId: event.data })
+-            } else if (event.type === 'token') {
++            if (event.type === 'token') {
+               fullText += event.data
+-              const displayText = extractAnswerFromPartialJson(fullText)
+-              if (displayText) {
+-                setStreamingContent(displayText)
+-              }
++              appendStreamingContent(event.data)
++            } else if (event.type === 'retrieved_sections') {
++              retrieved_sections = event.data || []
+             } else if (event.type === 'citations') {
+               citations = event.data || []
+             } else if (event.type === 'confidence') {
+               confidence = event.data || 'low'
+-            } else if (event.detail) {
+-              // Backend error event (e.g., Gemini rate limit)
+-              streamError = event.detail
++            } else if (event.type === 'conversation_id') {
++              set({ conversationId: event.data })
+             }
+           } catch { }
+         }
+       }
+ 
+-      // Parse the complete JSON to extract final answer + citations
++      // Parse the JSON answer from the streamed text
+       let answer = fullText
+       try {
+-        let raw = fullText.trim()
+-        if (raw.startsWith('```')) {
+-          raw = raw.split('\n', 1)[1]
+-          raw = raw.substring(0, raw.lastIndexOf('```')).trim()
+-        }
+-        const parsed = JSON.parse(raw)
+-        answer = parsed.answer || null
++        const parsed = JSON.parse(fullText)
++        answer = parsed.answer || fullText
+         if (!citations.length && parsed.citations) {
+           citations = parsed.citations
+         }
+         if (parsed.confidence) {
+           confidence = parsed.confidence
+         }
+-      } catch {
+-        // JSON parse failed — extract answer from partial JSON as fallback
+-        const extracted = extractAnswerFromPartialJson(fullText)
+-        if (extracted) {
+-          answer = extracted
+-        }
+-      }
++      } catch { }
+ 
+       setStreamingContent('')
+ 
+-      let finalAnswer
+-      if (streamError) {
+-        finalAnswer = 'The AI service is temporarily busy. Please wait a moment and try again.'
+-      } else {
+-        finalAnswer = answer || 'I could not find relevant information in the federal statutes.'
+-      }
++      const finalAnswer = answer || 'I could not find relevant information in the federal statutes.'
+ 
+       addMessage({
+         role: 'assistant',
+@@ -240,8 +179,8 @@ export const useChatStore = create((set, get) => ({
+         retrieved_sections,
+       })
+ 
+-      // Fire-and-forget TTS — must NOT affect the query pipeline
+-      try { get().playMessageAudio(finalAnswer) } catch {}
++      // Auto-play the final answer via TTS
++      get().playMessageAudio(finalAnswer)
+     } catch (err) {
+       setStreamingContent('')
+       addMessage({
+diff --git a/railway.toml b/railway.toml
+deleted file mode 100644
+index 2566e56..0000000
+--- a/railway.toml
++++ /dev/null
+@@ -1,8 +0,0 @@
+-[build]
+-builder = "dockerfile"
+-
+-[deploy]
+-healthcheckPath = "/api/health"
+-healthcheckTimeout = 300
+-restartPolicyType = "on_failure"
+-restartPolicyMaxRetries = 3
+diff --git a/requirements.txt b/requirements.txt
+index 7a288b3..85706b1 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,5 +1,6 @@
+ fastapi==0.115.*
+ uvicorn[standard]==0.34.*
++<<<<<<< HEAD
+ asyncpg==0.30.*
+ httpx==0.28.*
+ sentence-transformers==3.3.*
+@@ -9,3 +10,8 @@ sse-starlette==2.2.*
+ google-generativeai==0.8.*
+ python-dotenv==1.0.*
+ tqdm==4.67.*
++=======
++httpx==0.28.*
++pydantic-settings==2.7.*
++python-dotenv==1.0.*
++>>>>>>> origin/elevenlabs
