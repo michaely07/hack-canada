@@ -1,5 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import AppShell from './components/layout/AppShell'
+import LandingPage from './components/layout/LandingPage'
+import { useChatStore } from './stores/chatStore'
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -27,6 +29,24 @@ class ErrorBoundary extends Component {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true)
+  const sendQuery = useChatStore(s => s.sendQuery)
+
+  const handleEnter = (query) => {
+    setShowLanding(false)
+    if (query) {
+      setTimeout(() => sendQuery(query), 300)
+    }
+  }
+
+  if (showLanding) {
+    return (
+      <ErrorBoundary>
+        <LandingPage onEnter={handleEnter} />
+      </ErrorBoundary>
+    )
+  }
+
   return (
     <ErrorBoundary>
       <AppShell />
