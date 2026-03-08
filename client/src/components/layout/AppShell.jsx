@@ -5,30 +5,18 @@ import StatusBar from './StatusBar'
 import { useChatStore } from '../../stores/chatStore'
 import { useAuditorStore } from '../../stores/auditorStore'
 
-export default function AppShell() {
+export default function AppShell({ onBack }) {
   const { activeTab, setActiveTab } = useAuditorStore()
   const { isAudioPlaying, stopAudio, setSelectedVoiceId, setSelectedPresetId } = useChatStore()
   const [presets, setPresets] = useState([])
   const [activePreset, setActivePreset] = useState('')
+  const [panelOpen, setPanelOpen] = useState(true)
 
   const personaTints = {
-    assertive: 'radial-gradient(ellipse at top right, rgba(194,59,34,0.15), transparent 50%)',
-    analytical: 'radial-gradient(ellipse at top right, rgba(74,157,91,0.15), transparent 50%)',
-    empathetic: 'radial-gradient(ellipse at top right, rgba(201,168,76,0.15), transparent 50%)'
+    assertive: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.06), transparent 50%)',
+    analytical: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.06), transparent 50%)',
+    empathetic: 'radial-gradient(ellipse at top right, rgba(196,91,91,0.06), transparent 50%)'
   }
-
-  const personaAccents = {
-    assertive: { primary: '#C23B22', dim: '#992B16' },  // Sharp Red
-    analytical: { primary: '#4A9D5B', dim: '#357A43' }, // Methodical Teal/Green
-    empathetic: { primary: '#C9A84C', dim: '#9A7D3A' }  // Trustworthy Gold (Default)
-  }
-
-  // Handle global theme override
-  useEffect(() => {
-    const accents = personaAccents[activePreset] || personaAccents.empathetic
-    document.documentElement.style.setProperty('--gold', accents.primary)
-    document.documentElement.style.setProperty('--gold-dim', accents.dim)
-  }, [activePreset])
 
   useEffect(() => {
     fetch('/api/voice/presets')
@@ -54,8 +42,7 @@ export default function AppShell() {
   }
 
   return (
-    <div className="h-screen flex flex-col relative overflow-hidden bg-transparent">
-      {/* Persona Tint Background Overlay */}
+    <div className="h-screen flex flex-col relative overflow-hidden" style={{ background: 'var(--navy)' }}>
       <div
         className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out"
         style={{
@@ -64,13 +51,13 @@ export default function AppShell() {
         }}
       />
 
-      <header className="flex items-center justify-between px-6 py-3 relative z-10">
+      <header className="flex items-center justify-between px-6 py-3 relative z-10" style={{ minHeight: '48px' }}>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold" style={{ color: 'var(--gold)' }}>
-              StatuteLens
+          <div className="flex items-baseline gap-3">
+            <h1 onClick={onBack} className="text-xl font-semibold cursor-pointer hover:opacity-80 transition-opacity leading-none" style={{ color: 'var(--gold)' }}>
+              SpecterBot
             </h1>
-            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-sm leading-none" style={{ color: 'var(--text-secondary)' }}>
               Canadian Federal Law
             </span>
           </div>
@@ -80,18 +67,17 @@ export default function AppShell() {
               onClick={stopAudio}
               className="px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center gap-2"
               style={{
-                background: 'rgba(255, 100, 100, 0.1)',
-                color: '#ff6b6b',
-                border: '1px solid rgba(255, 100, 100, 0.2)'
+                background: 'rgba(196, 91, 91, 0.1)',
+                color: 'var(--gold)',
+                border: '1px solid rgba(196, 91, 91, 0.2)'
               }}
             >
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#ff6b6b' }} />
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />
               Stop Voice
             </button>
           )}
         </div>
 
-        {/* Voice Preset Selector */}
         {presets.length > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Counsel:</span>
@@ -102,7 +88,7 @@ export default function AppShell() {
                   onClick={() => handlePresetChange(p.id)}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
                   style={{
-                    background: activePreset === p.id ? 'rgba(201, 168, 76, 0.15)' : 'transparent',
+                    background: activePreset === p.id ? 'rgba(196, 91, 91, 0.1)' : 'transparent',
                     color: activePreset === p.id ? 'var(--gold)' : 'var(--text-secondary)',
                     border: `1px solid ${activePreset === p.id ? 'var(--gold-dim)' : 'var(--navy-lighter)'}`,
                   }}
@@ -116,63 +102,60 @@ export default function AppShell() {
         )}
       </header>
 
-      {/* Glowing Horizontal Separation Bar */}
       <div className="w-full h-[1px] relative z-20"
-        style={{
-          background: 'linear-gradient(to right, transparent, var(--gold-dim), transparent)',
-          opacity: 0.5,
-          boxShadow: '0 0 8px var(--gold-dim)'
-        }}
+        style={{ background: 'var(--navy-lighter)' }}
       />
 
       <div className="flex flex-1 overflow-hidden relative z-10">
-        <div className="w-[60%] flex flex-col relative">
+        <div className="flex flex-col relative transition-all duration-300 ease-in-out" style={{ width: panelOpen ? '60%' : '100%' }}>
           <ChatPane />
-          {/* Glowing Divider */}
-          <div className="absolute right-0 top-0 bottom-0 w-[1px]"
-            style={{
-              background: 'linear-gradient(to bottom, transparent, var(--gold-dim), transparent)',
-              opacity: 0.3,
-              boxShadow: '0 0 8px var(--gold-dim)'
-            }}
-          />
+          {panelOpen && (
+            <div className="absolute right-0 top-0 bottom-0 w-[1px]"
+              style={{ background: 'var(--navy-lighter)' }}
+            />
+          )}
         </div>
 
-        <div className="w-[40%] flex flex-col bg-opacity-50" style={{ background: 'var(--navy-light)' }}>
+        {/* Toggle button */}
+        <button
+          onClick={() => setPanelOpen(!panelOpen)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-5 h-10 rounded-l-md transition-all duration-200 hover:opacity-100"
+          style={{
+            background: 'var(--navy-lighter)',
+            color: 'var(--text-secondary)',
+            opacity: 0.7,
+            right: panelOpen ? '40%' : '0',
+          }}
+          title={panelOpen ? 'Collapse panel' : 'Expand panel'}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            {panelOpen ? <polyline points="9 6 15 12 9 18" /> : <polyline points="15 6 9 12 15 18" />}
+          </svg>
+        </button>
+
+        <div
+          className="flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+          style={{
+            width: panelOpen ? '40%' : '0',
+            opacity: panelOpen ? 1 : 0,
+            background: 'var(--navy-light)',
+          }}
+        >
           <div className="flex border-b" style={{ borderColor: 'var(--navy-lighter)', background: 'var(--navy)' }}>
-            <button
-              onClick={() => setActiveTab('source')}
-              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'source' ? 'border-b-2' : 'hover:bg-white/5'}`}
-              style={{
-                borderColor: activeTab === 'source' ? 'var(--gold)' : 'transparent',
-                color: activeTab === 'source' ? 'var(--gold)' : 'var(--text-secondary)',
-                opacity: activeTab === 'source' ? 1 : 0.7
-              }}
-            >
-              Source Viewer
-            </button>
-            <button
-              onClick={() => setActiveTab('analysis')}
-              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'analysis' ? 'border-b-2' : 'hover:bg-white/5'}`}
-              style={{
-                borderColor: activeTab === 'analysis' ? 'var(--gold)' : 'transparent',
-                color: activeTab === 'analysis' ? 'var(--gold)' : 'var(--text-secondary)',
-                opacity: activeTab === 'analysis' ? 1 : 0.7
-              }}
-            >
-              Analysis
-            </button>
-            <button
-              onClick={() => setActiveTab('graph')}
-              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'graph' ? 'border-b-2' : 'hover:bg-white/5'}`}
-              style={{
-                borderColor: activeTab === 'graph' ? 'var(--gold)' : 'transparent',
-                color: activeTab === 'graph' ? 'var(--gold)' : 'var(--text-secondary)',
-                opacity: activeTab === 'graph' ? 1 : 0.7
-              }}
-            >
-              Legal Graph
-            </button>
+            {['source', 'analysis', 'graph'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-5 py-3 text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab ? 'border-b-2' : ''}`}
+                style={{
+                  borderColor: activeTab === tab ? 'var(--gold)' : 'transparent',
+                  color: activeTab === tab ? 'var(--gold)' : 'var(--text-secondary)',
+                  opacity: activeTab === tab ? 1 : 0.7
+                }}
+              >
+                {tab === 'source' ? 'Source Viewer' : tab === 'analysis' ? 'Analysis' : 'Legal Graph'}
+              </button>
+            ))}
           </div>
           <AuditorPane activeTab={activeTab} />
         </div>

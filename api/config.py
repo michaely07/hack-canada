@@ -1,5 +1,5 @@
 """
-StatuteLens configuration — loads settings from .env file.
+SpecterBot configuration — loads settings from .env file.
 """
 
 from pydantic_settings import BaseSettings

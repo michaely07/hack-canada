@@ -5,7 +5,7 @@ from etl.ingest import run_ingestion
 
 
 def main():
-    parser = argparse.ArgumentParser(description="StatuteLens ETL: ingest Canadian laws XML into PostgreSQL")
+    parser = argparse.ArgumentParser(description="SpecterBot ETL: ingest Canadian laws XML into PostgreSQL")
     parser.add_argument("--repo-path", default="./laws-lois-xml")
     parser.add_argument("--db-url", default="postgresql://dev:dev@localhost:5433/statutelens")
     parser.add_argument("--reset", action="store_true", help="Wipe and reload all data")

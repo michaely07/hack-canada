@@ -1,4 +1,4 @@
--- StatuteLens Database Schema
+-- SpecterBot Database Schema
 -- PostgreSQL 16 + pgvector
 
 CREATE EXTENSION IF NOT EXISTS vector;

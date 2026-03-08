@@ -1,11 +1,10 @@
 """
-StatuteLens — FastAPI application entry point.
+SpecterBot — FastAPI application entry point.
 """
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from api.config import settings
 from api.db import init_pool, close_pool
 from api.services.embedder import init_embedder
@@ -20,7 +19,7 @@ async def lifespan(app: FastAPI):
     await close_pool()
 
 app = FastAPI(
-    title="StatuteLens API",
+    title="SpecterBot API",
     description="AI-Powered Legal Research Platform for Canadian Federal Law",
     version="0.1.0",
     lifespan=lifespan
@@ -67,14 +66,6 @@ async def health():
         }
     except Exception:
         return {"status": "ok", "db": False}
-
-# Serve the voice test page at root
-@app.get("/")
-async def serve_test_page():
-    import os
-    if os.path.exists("test_voice.html"):
-        return FileResponse("test_voice.html")
-    return {"message": "StatuteLens API"}
 
 # Serve React static build in production
 import os
