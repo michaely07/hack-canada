@@ -17,10 +17,10 @@ export default function ChatPane() {
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <h2 className="text-2xl mb-2" style={{ color: 'var(--gold)' }}>
+              <h2 className="text-2xl mb-2" style={{ color: 'var(--gold)', fontFamily: "'Playfair Display', serif" }}>
                 Ask a legal question
               </h2>
-              <p style={{ color: 'var(--text-secondary)' }}>
+              <p style={{ color: 'var(--text-secondary)', fontFamily: "'Lora', serif" }}>
                 Answers are grounded in Canadian federal statutes
               </p>
             </div>

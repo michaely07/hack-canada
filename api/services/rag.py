@@ -33,76 +33,33 @@ CONFIDENCE LEVELS:
 
 REFORMULATION_PROMPT = """Given the following conversation history and a new user question, rewrite the user's question into a standalone, comprehensive search query that can be understood without the conversation history.
 
-DO NOT answer the question. ONLY output the rewritten search query.
-If the new user question is already self-contained or is changing the topic entirely, just output the new question as-is.
-
-Make sure to include implicit context (e.g., "taxes" -> "federal income tax", "assault" -> "criminal code assault")."""
-
-
-async def reformulate_query(query: str, history: list[dict] | None = None) -> str:
-    if not history:
-        return query
-
-    # Only look at the last few turns for context
-    turns = []
-    for msg in history[-4:]:
-        role = "User" if msg["role"] == "user" else "Assistant"
-        turns.append(f"{role}: {msg['content']}")
-    history_block = "\n".join(turns)
-
-    prompt = f"{REFORMULATION_PROMPT}\n\nCONVERSATION HISTORY:\n{history_block}\n\nNEW QUESTION: {query}\n\nREWRITTEN QUERY:"
-    
-    try:
-        response = await client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            max_tokens=100
-        )
-        reformulated = response.choices[0].message.content.strip()
-        # Clean up any quotes the LLM might have added
-        if reformulated.startswith('"') and reformulated.endswith('"'):
-            reformulated = reformulated[1:-1]
-        return reformulated
-    except Exception:
-        # Fallback to the original query if the LLM fails
-        return query
-
-
-def build_prompt(query: str, sections: list[SectionResult], persona: str | None = None, history: list[dict] | None = None) -> str:
+def build_prompt(query: str, sections: list[SectionResult], history: list[dict] | None = None) -> str:
     context_blocks = "\n---\n".join(
         f"[{s.law_title} | Section {s.label} | lims_id: {s.lims_id}]\n{s.content_text}"
         for s in sections
     )
-    persona_block = f"\n\n{persona}" if persona else ""
 
-    # Include recent conversation history for context
     history_block = ""
     if history:
-        turns = []
-        for msg in history[-6:]:  # last 3 exchanges (6 messages)
-            role = "User" if msg["role"] == "user" else "You"
-            turns.append(f"{role}: {msg['content']}")
-        history_block = f"\n\nRECENT CONVERSATION:\n" + "\n".join(turns)
+        lines = []
+        for msg in history[-10:]:
+            role_label = "USER" if msg["role"] == "user" else "ASSISTANT"
+            lines.append(f"{role_label}: {msg['content']}")
+        history_block = f"\nCONVERSATION HISTORY:\n" + "\n".join(lines) + "\n"
 
-    return f"""{SYSTEM_PROMPT}{persona_block}{history_block}
-
+    return f"""{SYSTEM_PROMPT}
+{history_block}
 CONTEXT BLOCKS:
 {context_blocks}
 
 USER QUESTION: {query}"""
 
 
-async def generate_response(query: str, sections: list[SectionResult], persona: str | None = None, history: list[dict] | None = None) -> dict:
-    prompt = build_prompt(query, sections, persona, history)
-    
-    # Require JSON output in prompt to use json_object mode
-    json_instruction = "\n\nYou must return your response in the requested strict JSON format."
-    
-    response = await client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[{"role": "user", "content": prompt + json_instruction}],
-        response_format={"type": "json_object"}
+async def generate_response(query: str, sections: list[SectionResult], history: list[dict] | None = None) -> dict:
+    prompt = build_prompt(query, sections, history)
+    response = model.generate_content(
+        prompt, 
+        generation_config={"response_mime_type": "application/json"}
     )
     
     raw = response.choices[0].message.content.strip()
@@ -125,17 +82,12 @@ async def generate_response(query: str, sections: list[SectionResult], persona: 
     return parsed
 
 
-async def generate_response_stream(query: str, sections: list[SectionResult], persona: str | None = None, history: list[dict] | None = None):
-    prompt = build_prompt(query, sections, persona, history)
-    
-    # Require JSON output in prompt to use json_object mode
-    json_instruction = "\n\nYou must return your response in the requested strict JSON format."
-    
-    stream = await client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[{"role": "user", "content": prompt + json_instruction}],
-        response_format={"type": "json_object"},
-        stream=True
+async def generate_response_stream(query: str, sections: list[SectionResult], history: list[dict] | None = None):
+    prompt = build_prompt(query, sections, history)
+    response = model.generate_content(
+        prompt, 
+        stream=True, 
+        generation_config={"response_mime_type": "application/json"}
     )
     
     full_text = ""

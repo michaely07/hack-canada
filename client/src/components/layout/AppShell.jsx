@@ -5,6 +5,19 @@ import StatusBar from './StatusBar'
 import { useChatStore } from '../../stores/chatStore'
 import { useAuditorStore } from '../../stores/auditorStore'
 
+function MapleLeaf() {
+  return (
+    <img
+      className="maple-leaf"
+      src="https://static.vecteezy.com/system/resources/previews/034/169/496/non_2x/canadian-maple-leaf-isolated-on-a-transparent-background-free-png.png"
+      alt="Canadian Maple Leaf"
+      width="32"
+      height="32"
+      style={{ objectFit: 'contain' }}
+    />
+  )
+}
+
 export default function AppShell() {
   const { activeTab, setActiveTab } = useAuditorStore()
   const { isAudioPlaying, stopAudio, setSelectedVoiceId, setSelectedPresetId } = useChatStore()
@@ -54,23 +67,15 @@ export default function AppShell() {
   }
 
   return (
-    <div className="h-screen flex flex-col relative overflow-hidden bg-transparent">
-      {/* Persona Tint Background Overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none transition-all duration-1000 ease-in-out"
-        style={{
-          background: personaTints[activePreset] || 'transparent',
-          zIndex: 0
-        }}
-      />
-
-      <header className="flex items-center justify-between px-6 py-3 relative z-10">
+    <div className="h-screen flex flex-col" style={{ background: 'var(--navy)' }}>
+      <header className="flex items-center justify-between px-6 py-3 border-b"
+              style={{ borderColor: 'rgba(201, 168, 76, 0.12)' }}>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold" style={{ color: 'var(--gold)' }}>
+            <h1 className="text-xl font-semibold tracking-wide" style={{ color: 'var(--gold)' }}>
               StatuteLens
             </h1>
-            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-sm" style={{ color: 'var(--text-secondary)', fontFamily: "'Lora', serif" }}>
               Canadian Federal Law
             </span>
           </div>
@@ -91,42 +96,12 @@ export default function AppShell() {
           )}
         </div>
 
-        {/* Voice Preset Selector */}
-        {presets.length > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Counsel:</span>
-            <div className="flex gap-1">
-              {presets.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => handlePresetChange(p.id)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
-                  style={{
-                    background: activePreset === p.id ? 'rgba(201, 168, 76, 0.15)' : 'transparent',
-                    color: activePreset === p.id ? 'var(--gold)' : 'var(--text-secondary)',
-                    border: `1px solid ${activePreset === p.id ? 'var(--gold-dim)' : 'var(--navy-lighter)'}`,
-                  }}
-                  title={p.description}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <MapleLeaf />
       </header>
 
-      {/* Glowing Horizontal Separation Bar */}
-      <div className="w-full h-[1px] relative z-20"
-        style={{
-          background: 'linear-gradient(to right, transparent, var(--gold-dim), transparent)',
-          opacity: 0.5,
-          boxShadow: '0 0 8px var(--gold-dim)'
-        }}
-      />
-
-      <div className="flex flex-1 overflow-hidden relative z-10">
-        <div className="w-[60%] flex flex-col relative">
+      <div className="flex flex-1 overflow-hidden">
+        {/* Chat panel — 60% */}
+        <div className="flex flex-col" style={{ width: '60%' }}>
           <ChatPane />
           {/* Glowing Divider */}
           <div className="absolute right-0 top-0 bottom-0 w-[1px]"
@@ -138,15 +113,18 @@ export default function AppShell() {
           />
         </div>
 
-        <div className="w-[40%] flex flex-col bg-opacity-50" style={{ background: 'var(--navy-light)' }}>
-          <div className="flex border-b" style={{ borderColor: 'var(--navy-lighter)', background: 'var(--navy)' }}>
+        {/* Glowing divider */}
+        <div className="panel-divider" />
+
+        {/* Source viewer — 40% */}
+        <div className="flex flex-col" style={{ width: '40%' }}>
+          <div className="flex border-b" style={{ borderColor: 'rgba(201, 168, 76, 0.12)' }}>
             <button
               onClick={() => setActiveTab('source')}
-              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'source' ? 'border-b-2' : 'hover:bg-white/5'}`}
+              className={`tab-button px-5 py-2.5 text-sm font-medium ${activeTab === 'source' ? 'active' : ''}`}
               style={{
-                borderColor: activeTab === 'source' ? 'var(--gold)' : 'transparent',
                 color: activeTab === 'source' ? 'var(--gold)' : 'var(--text-secondary)',
-                opacity: activeTab === 'source' ? 1 : 0.7
+                borderBottom: 'none',
               }}
             >
               Source Viewer
@@ -164,11 +142,10 @@ export default function AppShell() {
             </button>
             <button
               onClick={() => setActiveTab('graph')}
-              className={`px-5 py-3 text-sm font-medium transition-all ${activeTab === 'graph' ? 'border-b-2' : 'hover:bg-white/5'}`}
+              className={`tab-button px-5 py-2.5 text-sm font-medium ${activeTab === 'graph' ? 'active' : ''}`}
               style={{
-                borderColor: activeTab === 'graph' ? 'var(--gold)' : 'transparent',
                 color: activeTab === 'graph' ? 'var(--gold)' : 'var(--text-secondary)',
-                opacity: activeTab === 'graph' ? 1 : 0.7
+                borderBottom: 'none',
               }}
             >
               Legal Graph
