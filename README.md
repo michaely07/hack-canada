@@ -28,8 +28,8 @@ You ask a question
 | Layer | What it does |
 |-------|-------------|
 | **ETL** | Parses the Justice Canada XML repo, stores in PostgreSQL + pgvector |
-| **Backend** | FastAPI + RAG pipeline. Retrieves top sections, sends to Gemini Flash, validates citations against retrieved context |
-| **Frontend** | React split-screen: 40% chat with citation badges, 60% source auditor showing exact statutory text + raw XML |
+| **Backend** | FastAPI + RAG pipeline. Retrieves top sections, sends to API, validates citations against retrieved context |
+| **Frontend** | React split-screen: 60% chat with citation badges, 40% source auditor showing exact statutory text + raw XML |
 | **Voice** | ElevenLabs Conversational AI agent with a custom-designed voice, backed by the same RAG pipeline |
 
 ---
