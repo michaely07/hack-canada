@@ -54,19 +54,24 @@ code,
   font-family: 'IBM Plex Mono', monospace;
 }
 
-/* Custom Scrollbar Styles */
+/* Custom Scrollbar Styles — thin, hidden until hover */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--navy);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--navy-lighter);
+  background: transparent;
   border-radius: 4px;
+}
+
+*:hover > ::-webkit-scrollbar-thumb,
+*:hover::-webkit-scrollbar-thumb {
+  background: var(--navy-lighter);
 }
 
 ::-webkit-scrollbar-thumb:hover {
