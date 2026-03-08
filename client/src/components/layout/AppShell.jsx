@@ -5,7 +5,7 @@ import StatusBar from './StatusBar'
 import { useChatStore } from '../../stores/chatStore'
 import { useAuditorStore } from '../../stores/auditorStore'
 
-export default function AppShell() {
+export default function AppShell({ onBack }) {
   const { activeTab, setActiveTab } = useAuditorStore()
   const { isAudioPlaying, stopAudio, setSelectedVoiceId, setSelectedPresetId } = useChatStore()
   const [presets, setPresets] = useState([])
@@ -65,7 +65,7 @@ export default function AppShell() {
       <header className="flex items-center justify-between px-6 py-3 relative z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold" style={{ color: 'var(--gold)' }}>
+            <h1 onClick={onBack} className="text-xl font-semibold cursor-pointer hover:opacity-80 transition-opacity" style={{ color: 'var(--gold)' }}>
               StatuteLens
             </h1>
             <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>

@@ -60,7 +60,7 @@ export default function App() {
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className="h-screen"
           >
-            <AppShell />
+            <AppShell onBack={() => setShowLanding(true)} />
           </motion.div>
         )}
       </AnimatePresence>
